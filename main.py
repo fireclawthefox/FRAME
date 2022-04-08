@@ -1,7 +1,8 @@
 from direct.showbase.ShowBase import ShowBase
-from Frame.Frame import Frame
 
 from panda3d.core import loadPrcFileData
+
+from editorLogHandler import setup_log
 
 """
 F: Free
@@ -27,8 +28,11 @@ loadPrcFileData(
     win-size 1280 720
     """)
 
+logfile = setup_log("FRAME")
+
 base = ShowBase()
 
+from Frame.Frame import Frame
 Frame()
 
 base.run()
