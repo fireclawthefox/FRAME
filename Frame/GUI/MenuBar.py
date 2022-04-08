@@ -27,12 +27,12 @@ class MenuBar(DirectObject):
             parent=base.pixel2d)
 
         self.project_entries = [
-            DirectMenuItemEntry("New", base.messenger.send, ["newProject"]),
+            DirectMenuItemEntry("New", base.messenger.send, ["FRAME_new_project"]),
             DirectMenuSeparator(),
-            DirectMenuItemEntry("Open", base.messenger.send, ["loadProject"]),
-            DirectMenuItemEntry("Save", base.messenger.send, ["saveProject"]),
+            DirectMenuItemEntry("Open", base.messenger.send, ["FRAME_load_project"]),
+            DirectMenuItemEntry("Save", base.messenger.send, ["FRAME_save_project"]),
             DirectMenuSeparator(),
-            DirectMenuItemEntry("Quit", base.messenger.send, ["quit_app"]),
+            DirectMenuItemEntry("Quit", base.messenger.send, ["FRAME_quit_app"]),
             ]
         self.project = self.__create_menu_item("Project", self.project_entries)
 

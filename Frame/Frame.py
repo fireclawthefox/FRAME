@@ -17,18 +17,23 @@ from direct.gui.DirectFrame import DirectFrame
 
 from DirectGuiExtension.DirectTooltip import DirectTooltip
 
-from Frame.GUI.MainView import MainView
+from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
-HAS_SCENE_EDITOR = True
+from Frame.GUI.MainView import MainView
+from Frame.core.FrameProject import FrameProject
+
+HAS_SCENE_EDITOR = ConfigVariableBool("frame-enable-scene-editor", False).getValue()
 try:
     from SceneEditor.SceneEditor import SceneEditor
 except:
+    logging.info("FRAME: Scene editor not available")
     HAS_SCENE_EDITOR = False
 
-HAS_GUI_EDITOR = True
+HAS_GUI_EDITOR = ConfigVariableBool("frame-enable-gui-editor", True).getValue()
 try:
     from DirectGuiDesigner.DirectGuiDesigner import DirectGuiDesigner
 except:
+    logging.info("FRAME: GUI editor not available")
     HAS_GUI_EDITOR = False
 
 class Frame(DirectObject):
@@ -77,10 +82,14 @@ class Frame(DirectObject):
         sys.excepthook = self.excHandler
         base.win.setCloseRequestEvent("FRAME_quit_app")
 
+        self.frameProject = FrameProject()
+
         self.enable_events()
 
     def enable_events(self):
         self.accept("FRAME_quit_app", self.quit_app)
+
+        self.accept("FRAME_new_project", self.new_project)
 
         self.accept("request_dirty_name", self.set_dirty_name)
         self.accept("request_clean_name", self.set_clean_name)
@@ -98,6 +107,20 @@ class Frame(DirectObject):
             wp = WindowProperties()
             wp.setTitle("Panda3D FRAME")
             base.win.requestProperties(wp)
+
+    def new_project(self):
+        def selectProjectDirPath(confirm):
+            if confirm:
+                self.frameProject.create_new_project(self.browser.get())
+            self.browser.hide()
+            self.browser = None
+        self.browser = DirectFolderBrowser(
+            selectProjectDirPath,
+            False,
+            "",
+            "",
+            tooltip=self.tt)
+        self.browser.show()
 
     def __quit(self, selection):
         if selection == 1:
