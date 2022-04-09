@@ -29,7 +29,6 @@ class MainView(DirectObject):
             state=DGG.DISABLED,
             orientation=DGG.VERTICAL,
             autoUpdateFrameSize=False)
-        self.main_box.set_transparency(1)
         # our root element for the main box
         self.main_sizer = DirectAutoSizer(
             frameColor=(0,0,0,0),
