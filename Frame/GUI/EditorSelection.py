@@ -5,6 +5,8 @@ from direct.gui import DirectGuiGlobals as DGG
 from direct.gui.DirectButton import DirectButton
 from direct.gui.DirectFrame import DirectFrame
 
+from panda3d.core import TransparencyAttrib
+
 class EditorFrame:
     editor_instance = None
     editor_frame = None
@@ -59,6 +61,7 @@ class EditorSelection:
             pressEffect=False,
             frameSize=(-half_width,half_width,-half_width,half_width),
             command=self.select_editor)
+        ef.selection_button.set_transparency(TransparencyAttrib.M_alpha)
         self.editor_selection.addItem(ef.selection_button)
         ef.selection_button.bind(DGG.ENTER, tooltip.show, [tooltip_text])
         ef.selection_button.bind(DGG.EXIT, tooltip.hide)
