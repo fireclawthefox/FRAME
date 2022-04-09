@@ -22,7 +22,7 @@ from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 from Frame.GUI.MainView import MainView
 from Frame.core.FrameProject import FrameProject
 
-HAS_SCENE_EDITOR = ConfigVariableBool("frame-enable-scene-editor", False).getValue()
+HAS_SCENE_EDITOR = ConfigVariableBool("frame-enable-scene-editor", True).getValue()
 try:
     from SceneEditor.SceneEditor import SceneEditor
 except:
