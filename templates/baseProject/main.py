@@ -31,6 +31,8 @@ class Main(ShowBase, CoreFSM):
         base.notify.info(f"Version {config.versionstring}")
         CoreFSM.__init__(self, "FSM-Core")
 
+        config.load_config()
+
         #
         # BASIC APPLICATION CONFIGURATIONS
         #
