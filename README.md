@@ -23,3 +23,12 @@ GitHub:
 https://github.com/fireclawthefox/DirectGuiDesigner
 
 Once they are installed on your system, they will appear in FRAME and can be selected from the left sidebar. They will work the same as if run standalone.
+
+## Installation/Preparation
+Currently the FRAME editor doesn't have an installer yet. Running from source only requires 3 steps though.
+
+1. Download the sorcecode hosted here on github
+2. run `pip install -r requirements.txt` from within the FRAME editor folder
+
+## Run FRAME
+To run the editor, call `python3 main.py` from within the FRAME editor folder. Dependent on your installation of python, the call may differ slightly with for example leaving out the 3 at the end of python3 or adding .exe for running on windows.
