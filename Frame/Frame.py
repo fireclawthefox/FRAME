@@ -20,6 +20,7 @@ from DirectGuiExtension.DirectTooltip import DirectTooltip
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
 from Frame.GUI.MainView import MainView
+from Frame.GUI.InternalEditors.EditorStore import EditorStore
 from Frame.core.FrameProject import FrameProject
 
 HAS_SCENE_EDITOR = ConfigVariableBool("frame-enable-scene-editor", True).getValue()
@@ -74,6 +75,14 @@ class Frame(DirectObject):
                 "GUI Designer")
             if first_editor_frame is None:
                 first_editor_frame = dg_ef
+
+        dg_ef = self.main_view.editor_selection.createEditorButton(
+            "icons/EditorSelectionStore.png",
+            EditorStore,
+            self.tt,
+            "Editor Store"
+            )
+
 
         if first_editor_frame is not None:
             self.main_view.editor_selection.select_editor(first_editor_frame)
