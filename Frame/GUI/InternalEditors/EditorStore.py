@@ -17,6 +17,12 @@ class PackageData:
     version_current: str = "-"
     version_new: str = ""
 
+@dataclass
+class PackageStoreInfo:
+    name: str
+    description: str
+    package_name: str
+
 class EditorEntry:
     def __init__(self, parent_box, editor_display_name, editor_description, package_data, update_package_info_func, even=True):
         color_shift = 0
@@ -253,41 +259,45 @@ class EditorStore:
 
 
     def add_store_entries(self):
-        self.add_entry_header(":Editors:")
-        entry = EditorEntry(
-            self.content_box,
-            "Scene Editor",
-            "Create and edit sceneries for your Panda3D applications\nLoad and place models, collision solids and much more.",
-            PackageData("SceneEditor"),
-            self.update_package_info,
-            False)
-        self.entries.append(entry)
+        packages = [
+            ":Editors:",
+            PackageStoreInfo(
+                "Scene Editor",
+                "Create and edit sceneries for your Panda3D applications\nLoad and place models, collision solids and much more.",
+                "SceneEditor"),
+            PackageStoreInfo(
+                "Gui Designer",
+                "Design graphical user interfaces with\nPanda3Ds DirectGUI system",
+                "DirectGuiDesigner"),
+            PackageStoreInfo(
+                "Node Editor",
+                "Visual logic editor using connectable nodes.",
+                "NodeEditor"),
+            ":Core:",
+            PackageStoreInfo(
+                "Direct GUI Extensions",
+                "Extension toolkit for Panda3Ds DirectGUI system\nImportant: Do not uninstall this, it is vital for FRAME.",
+                "DirectGuiExtension"),
+            PackageStoreInfo(
+                "Folder Browser",
+                "A folder browser extension for DirectGUI\nImportant: Do not uninstall this, it is vital for FRAME.",
+                "DirectFolderBrowser"),
+        ]
 
-        entry = EditorEntry(
-            self.content_box,
-            "Gui Designer",
-            "Design graphical user interfaces with\nPanda3Ds DirectGUI system",
-            PackageData("DirectGuiDesigner"),
-            self.update_package_info)
-        self.entries.append(entry)
-
-        self.add_entry_header(":Core:")
-        entry = EditorEntry(
-            self.content_box,
-            "Direct GUI Extensions",
-            "Extension toolkit for Panda3Ds DirectGUI system\nImportant: Do not uninstall this, it is vital for FRAME.",
-            PackageData("DirectGuiExtension"),
-            self.update_package_info,
-            False)
-        self.entries.append(entry)
-
-        entry = EditorEntry(
-            self.content_box,
-            "Folder Browser",
-            "A folder browser extension for DirectGUI\nImportant: Do not uninstall this, it is vital for FRAME.",
-            PackageData("DirectFolderBrowser"),
-            self.update_package_info)
-        self.entries.append(entry)
+        even = False
+        for info in packages:
+            if type(info) == str:
+                self.add_entry_header(info)
+            else:
+                entry = EditorEntry(
+                    self.content_box,
+                    info.name,
+                    info.description,
+                    PackageData(info.package_name),
+                    self.update_package_info,
+                    even)
+                self.entries.append(entry)
+                even = not even
 
         cs = self.content_box["frameSize"]
         self.store_frame["canvasSize"] = [cs[0], cs[1], cs[2] - 50, cs[3]]
