@@ -34,7 +34,7 @@ class EditorSelection:
     def set_editor_holder_frame(self, editor_holder_frame):
         self.editor_holder_frame = editor_holder_frame
 
-    def createEditorButton(self, icon, editor_class, tooltip, tooltip_text):
+    def createEditorButton(self, icon, editor_class, tooltip, tooltip_text, editor_class_extra_args=None):
         image_pad = 5
         half_width = self.width / 2
 
@@ -49,7 +49,12 @@ class EditorSelection:
         ef.editor_frame.hide()
 
         # create a deactivated instance
-        ef.editor_instance = editor_class(ef.editor_frame)
+        if editor_class_extra_args:
+            ef.editor_instance = editor_class(
+                ef.editor_frame,
+                *editor_class_extra_args)
+        else:
+            ef.editor_instance = editor_class(ef.editor_frame)
         ef.editor_instance.disable_editor()
 
         # Create the selection button on the left

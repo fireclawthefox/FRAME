@@ -27,15 +27,26 @@ HAS_SCENE_EDITOR = ConfigVariableBool("frame-enable-scene-editor", True).getValu
 try:
     from SceneEditor.SceneEditor import SceneEditor
 except:
-    logging.info("FRAME: Scene editor not available")
+    logging.info("FRAME: Scene editor not available", exc_info=True)
     HAS_SCENE_EDITOR = False
 
 HAS_GUI_EDITOR = ConfigVariableBool("frame-enable-gui-editor", True).getValue()
 try:
     from DirectGuiDesigner.DirectGuiDesigner import DirectGuiDesigner
 except:
-    logging.info("FRAME: GUI editor not available")
+    logging.info("FRAME: GUI editor not available", exc_info=True)
     HAS_GUI_EDITOR = False
+
+HAS_NODE_EDITOR = ConfigVariableBool("frame-enable-node-editor", True).getValue()
+try:
+    from NodeEditor.NodeEditor import NodeEditor
+    from Frame.Extensions.NodeEditor.Nodes.P3DEventNode import Node as P3DEventNode
+    from Frame.Extensions.NodeEditor.Nodes.P3DCallScriptNode import Node as P3DCallScriptNode
+    from Frame.Extensions.NodeEditor.Nodes.P3DScriptLoaderNode import Node as P3DScriptLoaderNode
+    from Frame.Extensions.NodeEditor.Exporters.PythonExporter import PythonExporter
+except:
+    logging.info("FRAME: Node editor not available", exc_info=True)
+    HAS_NODE_EDITOR = False
 
 class Frame(DirectObject):
     def __init__(self):
@@ -75,8 +86,23 @@ class Frame(DirectObject):
                 "GUI Designer")
             if first_editor_frame is None:
                 first_editor_frame = dg_ef
+        if HAS_NODE_EDITOR:
+            ne_ef = self.main_view.editor_selection.createEditorButton(
+                "icons/EditorSelectionNE.png",
+                NodeEditor,
+                self.tt,
+                "Node Editor",
+                [{"Logic >":{
+                    "Catch Event": ["P3DEventNode", P3DEventNode],
+                    "Load Script": ["P3DScriptLoaderNode", P3DScriptLoaderNode],
+                    "Call Function": ["P3DCallScriptNode", P3DCallScriptNode]
+                }},
+                {"Export Python Script": PythonExporter}],
+                )
+            if first_editor_frame is None:
+                first_editor_frame = ne_ef
 
-        dg_ef = self.main_view.editor_selection.createEditorButton(
+        es_ef = self.main_view.editor_selection.createEditorButton(
             "icons/EditorSelectionStore.png",
             EditorStore,
             self.tt,
