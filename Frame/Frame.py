@@ -39,7 +39,7 @@ except:
 
 HAS_NODE_EDITOR = ConfigVariableBool("frame-enable-node-editor", True).getValue()
 try:
-    from NodeEditor.NodeEditor import NodeEditor
+    from Panda3DNodeEditor.NodeEditor import NodeEditor
     from Frame.Extensions.NodeEditor.Nodes.P3DEventNode import Node as P3DEventNode
     from Frame.Extensions.NodeEditor.Nodes.P3DCallScriptNode import Node as P3DCallScriptNode
     from Frame.Extensions.NodeEditor.Nodes.P3DScriptLoaderNode import Node as P3DScriptLoaderNode

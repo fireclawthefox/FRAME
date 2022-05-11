@@ -6,8 +6,8 @@ Simplified BSD (BSD 2-Clause) License.
 See License.txt or http://opensource.org/licenses/BSD-2-Clause for more info
 """
 
-from NodeEditor.NodeCore.Nodes.NodeBase import NodeBase
-from NodeEditor.NodeCore.Sockets.InSocket import InSocket
+from Panda3DNodeEditor.NodeCore.Nodes.NodeBase import NodeBase
+from Panda3DNodeEditor.NodeCore.Sockets.InSocket import InSocket
 from Frame.Extensions.NodeEditor.Sockets.TextSocket import TextSocket
 
 class Node(NodeBase):

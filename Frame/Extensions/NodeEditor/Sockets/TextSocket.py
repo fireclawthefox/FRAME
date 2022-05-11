@@ -3,7 +3,7 @@
 
 # This file was created using the DirectGUI Designer
 
-from NodeEditor.NodeCore.Sockets.SocketBase import SocketBase, INSOCKET
+from Panda3DNodeEditor.NodeCore.Sockets.SocketBase import SocketBase, INSOCKET
 
 from direct.gui.DirectFrame import DirectFrame
 from direct.gui.DirectLabel import DirectLabel

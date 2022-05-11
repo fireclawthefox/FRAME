@@ -272,7 +272,7 @@ class EditorStore:
             PackageStoreInfo(
                 "Node Editor",
                 "Visual logic editor using connectable nodes.",
-                "NodeEditor"),
+                "Panda3DNodeEditor"),
             ":Core:",
             PackageStoreInfo(
                 "Direct GUI Extensions",
