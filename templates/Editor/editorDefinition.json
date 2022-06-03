@@ -1,0 +1,11 @@
+{
+    "name":"My Editor visible Name",
+    "module":"myEditor.myEditor",
+    "class":"MyEditor",
+    "configToEnable":"frame-enable-my-editor",
+    "order":50,
+    "icon":"MyEditorIcon.png",
+    "fileExtension":".myEd",
+    "extraArgsFunc":"",
+    "extraArgs":""
+}
