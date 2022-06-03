@@ -19,3 +19,24 @@ Currently the FRAME editor doesn't have an installer yet. Running from source on
 
 ## Run FRAME
 To run the editor, call `python3 main.py` from within the FRAME editor folder. Dependent on your installation of python, the call may differ slightly with for example leaving out the 3 at the end of python3 or adding .exe for running on windows.
+
+## Custom Editors
+In addition to the editors installable through the FRAME itself, custom editors can be created and easily be added.
+
+### Writing a custom editor
+A template for an editor can be found in the sources templates/Editor/ folder.
+The python file fouund in that template folder will be the main entry point class of your editor and contains all methods that will be used by the FRAME. If your editor doesn't make use of some of the methods, just leave them as they are but don't remove them. A description of what each function is used for can be found in the source.
+
+After creating an editor, you can include it in the FRAME by creating a new editor definition file. A definition template is also located in the template folder mentioned above. Currently it consists of the following entries
+|Tag|Description|
+|--|--|
+|name|The visible name of your editor|
+|module|Module name from where to import your editor (e.g. the **x.y** part of `from x.y import Editor`|
+|class|Class name to import from the module of youur editor (e.g. the **Editor** part of `from x.y import Editor`|
+|configToEnable|The name users can set in the editors config to enable/disable the editor. This should start with "frame-enable-"|
+|order|An integer value to set the order of the editor in the editor selection panel of the FRAME.|
+|icon|An icon name or path relative to the location of the definition json file|
+|fileExtension|Not yet used, but should contain the file extension used by the files saved by this editor|
+|extraArgsFunc|A function name to be called from the class given in the class tag (example call `Editor.myExtraArgsFunc()`). This method should return what will be passed as arguments when instantiating the editor|
+|extraArgs|A json list. Each list entry will be passed as a parameter when instantiating the editor class|
+
