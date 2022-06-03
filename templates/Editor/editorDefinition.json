@@ -7,5 +7,5 @@
     "icon":"MyEditorIcon.png",
     "fileExtension":".myEd",
     "extraArgsFunc":"",
-    "extraArgs":""
+    "extraArgs":[]
 }
