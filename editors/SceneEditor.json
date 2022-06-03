@@ -1,0 +1,11 @@
+{
+    "name":"Scene Editor",
+    "module":"SceneEditor.SceneEditor",
+    "class":"SceneEditor",
+    "configToEnable":"frame-enable-scene-editor",
+    "order":10,
+    "icon":"EditorSelectionSE.png",
+    "fileExtension":".scene",
+    "extraArgsFunc":"",
+    "extraArgs":""
+}

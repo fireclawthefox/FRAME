@@ -1,0 +1,11 @@
+{
+    "name":"GUI Designer",
+    "module":"DirectGuiDesigner.DirectGuiDesigner",
+    "class":"DirectGuiDesigner",
+    "configToEnable":"frame-enable-gui-editor",
+    "order":20,
+    "icon":"EditorSelectionGD.png",
+    "fileExtension":".ui",
+    "extraArgsFunc":"",
+    "extraArgs":""
+}

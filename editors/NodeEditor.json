@@ -1,0 +1,11 @@
+{
+    "name":"Logic Editor",
+    "module":"NodeEditor.NodeEditor",
+    "class":"NodeEditor",
+    "configToEnable":"frame-enable-node-editor",
+    "order":30,
+    "icon":"EditorSelectionNE.png",
+    "fileExtension":".logic",
+    "extraArgsFunc":"get_frame_logic_node_menu",
+    "extraArgs":""
+}
