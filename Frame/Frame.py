@@ -1,6 +1,10 @@
 import sys
 import os
 import logging
+import json
+import importlib
+
+from dataclasses import dataclass
 
 from panda3d.core import (
     Filename,
@@ -22,34 +26,28 @@ from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 from Frame.GUI.MainView import MainView
 from Frame.GUI.InternalEditors.EditorStore import EditorStore
 from Frame.core.FrameProject import FrameProject
+from Frame.Extensions.NodeEditor.NodeEditorExtender import NodeEditorExtender
 
-HAS_SCENE_EDITOR = ConfigVariableBool("frame-enable-scene-editor", True).getValue()
-try:
-    from SceneEditor.SceneEditor import SceneEditor
-except:
-    logging.info("FRAME: Scene editor not available", exc_info=True)
-    HAS_SCENE_EDITOR = False
 
-HAS_GUI_EDITOR = ConfigVariableBool("frame-enable-gui-editor", True).getValue()
-try:
-    from DirectGuiDesigner.DirectGuiDesigner import DirectGuiDesigner
-except:
-    logging.info("FRAME: GUI editor not available", exc_info=True)
-    HAS_GUI_EDITOR = False
+@dataclass
+class Editor:
+    name: str
+    class_def: str
+    config_to_enable: str
+    order: int
+    icon: str
+    file_extension: str
+    extra_args_func: str
+    extra_args: list
 
-HAS_NODE_EDITOR = ConfigVariableBool("frame-enable-node-editor", True).getValue()
-try:
-    from Panda3DNodeEditor.NodeEditor import NodeEditor
-    from Frame.Extensions.NodeEditor.Nodes.P3DEventNode import Node as P3DEventNode
-    from Frame.Extensions.NodeEditor.Nodes.P3DCallScriptNode import Node as P3DCallScriptNode
-    from Frame.Extensions.NodeEditor.Nodes.P3DScriptLoaderNode import Node as P3DScriptLoaderNode
-    from Frame.Extensions.NodeEditor.Exporters.PythonExporter import PythonExporter
-except:
-    logging.info("FRAME: Node editor not available", exc_info=True)
-    HAS_NODE_EDITOR = False
+    def __lt__(self, other):
+        return self.order < other.order
 
-class Frame(DirectObject):
-    def __init__(self):
+
+
+
+class Frame(DirectObject, NodeEditorExtender):
+    def __init__(self, editor_definitions_paths):
         fn = Filename.fromOsSpecific(os.path.dirname(__file__))
         fn.makeTrueCase()
         self.icon_dir = str(fn) + "/"
@@ -70,37 +68,58 @@ class Frame(DirectObject):
             sortOrder=1000)
 
         first_editor_frame = None
-        if HAS_SCENE_EDITOR:
-            se_ef = self.main_view.editor_selection.createEditorButton(
-                "icons/EditorSelectionSE.png",
-                SceneEditor,
-                self.tt,
-                "Scene Editor")
-            first_editor_frame = se_ef
 
-        if HAS_GUI_EDITOR:
-            dg_ef = self.main_view.editor_selection.createEditorButton(
-                "icons/EditorSelectionGD.png",
-                DirectGuiDesigner,
+        self.editors = []
+        for path in editor_definitions_paths:
+            if not os.path.exists(path):
+                continue
+            for root, dirs, files in os.walk(path):
+                for filename in files:
+                    editor_definition_file = os.path.join(root, filename)
+                    editor = self.load_editor_definition(editor_definition_file, root)
+                    if not editor:
+                        continue
+                    self.editors.append(editor)
+        self.editors.sort()
+        for editor in self.editors:
+            if not ConfigVariableBool(editor.config_to_enable, True).getValue():
+                continue
+
+            editor_class_extra_args = None
+
+            if editor.extra_args_func != "":
+                try:
+                    if hasattr(editor.class_def, editor.extra_args_func):
+                        editor_class_extra_args = getattr(
+                            editor.class_def,
+                            editor.extra_args_func)()
+                    elif hasattr(self, editor.extra_args_func):
+                        editor_class_extra_args = getattr(
+                            self,
+                            editor.extra_args_func)()
+                except Exception as e:
+                    logging.error(
+                        f"FRAME: Could not get extra arguments for {editor.name} via method call {editor.extra_args_func}",
+                        exc_info=True)
+            if len(editor.extra_args) > 0:
+                if type(editor_class_extra_args) is list:
+                    editor_class_extra_args.append(editor.extra_args)
+                elif editor_class_extra_args is not None:
+                    editor_class_extra_args = [editor_class_extra_args] \
+                        + editor.extra_args
+                else:
+                    editor_class_extra_args = editor.extra_args
+
+            logging.debug(f"load editor: {editor}")
+            editor_frame = self.main_view.editor_selection.createEditorButton(
+                editor.icon,
+                editor.class_def,
                 self.tt,
-                "GUI Designer")
+                editor.name,
+                editor_class_extra_args)
+
             if first_editor_frame is None:
-                first_editor_frame = dg_ef
-        if HAS_NODE_EDITOR:
-            ne_ef = self.main_view.editor_selection.createEditorButton(
-                "icons/EditorSelectionNE.png",
-                NodeEditor,
-                self.tt,
-                "Node Editor",
-                [{"Logic >":{
-                    "Catch Event": ["P3DEventNode", P3DEventNode],
-                    "Load Script": ["P3DScriptLoaderNode", P3DScriptLoaderNode],
-                    "Call Function": ["P3DCallScriptNode", P3DCallScriptNode]
-                }},
-                {"Export Python Script": PythonExporter}],
-                )
-            if first_editor_frame is None:
-                first_editor_frame = ne_ef
+                first_editor_frame = editor_frame
 
         es_ef = self.main_view.editor_selection.createEditorButton(
             "icons/EditorSelectionStore.png",
@@ -108,7 +127,6 @@ class Frame(DirectObject):
             self.tt,
             "Editor Store"
             )
-
 
         if first_editor_frame is not None:
             self.main_view.editor_selection.select_editor(first_editor_frame)
@@ -120,6 +138,34 @@ class Frame(DirectObject):
         self.frameProject = FrameProject()
 
         self.enable_events()
+
+    def load_editor_definition(self, editor_definition_file, root_path):
+        try:
+            with open(editor_definition_file, 'r') as edf:
+                edf_content = json.load(edf)
+                if edf_content is None:
+                    raise Exception("Editor definition not valid")
+
+                editor_module = importlib.import_module(edf_content["module"])
+                class_def = getattr(editor_module, edf_content["class"])
+
+                return Editor(
+                    edf_content["name"],
+                    class_def,
+                    edf_content["configToEnable"],
+                    edf_content["order"],
+                    os.path.join(root_path, edf_content["icon"]),
+                    edf_content["fileExtension"]
+                    if "fileExtension" in edf_content else "",
+                    edf_content["extraArgsFunc"]
+                    if "extraArgsFunc" in edf_content else "",
+                    edf_content["extraArgs"] if "extraArgs" in edf_content else []
+                    )
+        except Exception as e:
+            logging.error(
+                f"FRAME: Couldn't load editor definition {editor_definition_file}",
+                exc_info=True)
+        return None
 
     def enable_events(self):
         self.accept("FRAME_quit_app", self.quit_app)
