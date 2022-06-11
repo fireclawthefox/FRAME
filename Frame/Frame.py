@@ -75,6 +75,8 @@ class Frame(DirectObject, NodeEditorExtender):
                 continue
             for root, dirs, files in os.walk(path):
                 for filename in files:
+                    if not filename.endswith(".json"):
+                        continue
                     editor_definition_file = os.path.join(root, filename)
                     editor = self.load_editor_definition(editor_definition_file, root)
                     if not editor:
