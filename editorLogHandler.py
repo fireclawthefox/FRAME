@@ -49,6 +49,12 @@ def setup_log(editor_name, log_to_console=False):
         level=logging.DEBUG,
         handlers=logHandlers)
 
+    for root, dirs, files in os.walk(basePath):
+        for f in files:
+            if not f.endswith(".prc"):
+                continue
+            config_file = os.path.join(root, f)
+            loadPrcFile(config_file)
 
     config_file = os.path.join(basePath, f".{editor_name}.prc")
     if os.path.exists(config_file):

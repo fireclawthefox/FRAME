@@ -56,13 +56,15 @@ class EditorSelection:
         else:
             ef.editor_instance = editor_class(ef.editor_frame)
 
+        editor_save_name = tooltip_text.replace(" ", "_").lower()
+        editor_specific_conf = config_file[:-4] + f"_{editor_save_name}.prc"
         ef.editor_instance.log_file = log_file
-        ef.editor_instance.config_file = config_file
+        ef.editor_instance.config_file = editor_specific_conf
         ef.editor_instance.disable_editor()
 
         # Create the selection button on the left
         ef.selection_button = DirectButton(
-            text="SE",
+            text="FE",
             frameColor=(0,0,0,0),
             image=icon,
             image_scale=half_width - image_pad,
