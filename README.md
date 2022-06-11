@@ -20,6 +20,18 @@ Currently the FRAME editor doesn't have an installer yet. Running from source on
 ## Run FRAME
 To run the editor, call `python3 main.py` from within the FRAME editor folder. Dependent on your installation of python, the call may differ slightly with for example leaving out the 3 at the end of python3 or adding .exe for running on windows.
 
+## Official Editors
+Official editors of the FRAME can be installed through the FRAMES editor store page. Currently those include the following:
+
+### Scene Editor
+https://github.com/fireclawthefox/SceneEditor
+
+### GUI Designer
+https://github.com/fireclawthefox/DirectGuiDesigner
+
+### Logic Editor
+https://github.com/fireclawthefox/NodeEditor
+
 ## Custom Editors
 In addition to the editors installable through the FRAME itself, custom editors can be created and easily be added.
 
