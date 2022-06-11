@@ -2,6 +2,13 @@ class Editor:
     def __init__(self, parent):
         # Initial setup of the Editor
 
+        # path of the log file, don't change it here. This will be set when
+        # the editor is initialized in FRAME!
+        self.log_file = ""
+        # path of the configuration file, don't change it here. This will be
+        # set when the editor is initialized in FRAME!
+        self.config_file = ""
+
     def is_dirty(self):
         """
         This method returns True if an unsaved state of the editor is given

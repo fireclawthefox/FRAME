@@ -10,10 +10,10 @@ from panda3d.core import (
     loadPrcFileData,
     loadPrcFile,
     Filename,
-    ConfigVariableSearchPath,
+    ConfigVariableBool,
 )
 
-def setup_log(editor_name):
+def setup_log(editor_name, log_to_console=False):
     # check if we have a config file
     home = os.path.expanduser("~")
     basePath = os.path.join(home, f".{editor_name}")
@@ -37,21 +37,26 @@ def setup_log(editor_name):
             # this file does not have a date ending
             pass
 
-    logfile = os.path.join(logPath, f"{editor_name}.log")
-    handler = TimedRotatingFileHandler(logfile)
+    log_file = os.path.join(logPath, f"{editor_name}.log")
+    handler = TimedRotatingFileHandler(log_file)
     consoleHandler = StreamHandler()
+
+    logHandlers = [handler]
+    if log_to_console:
+        logHandlers.append(consoleHandler)
+
     logging.basicConfig(
         level=logging.DEBUG,
-        handlers=[handler])#, consoleHandler])
+        handlers=logHandlers)
 
 
-    prcFileName = os.path.join(basePath, f".{editor_name}.prc")
-    if os.path.exists(prcFileName):
-        loadPrcFile(Filename.fromOsSpecific(prcFileName))
+    config_file = os.path.join(basePath, f".{editor_name}.prc")
+    if os.path.exists(config_file):
+        loadPrcFile(Filename.fromOsSpecific(config_file))
     else:
-        with open(prcFileName, "w") as prcFile:
+        with open(config_file, "w") as prcFile:
             prcFile.write("skip-ask-for-quit #f\n")
             prcFile.write("frame-enable-scene-editor #t\n")
             prcFile.write("frame-enable-gui-editor #t\n")
 
-    return logfile
+    return log_file, config_file

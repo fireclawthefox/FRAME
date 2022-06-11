@@ -19,7 +19,7 @@ loadPrcFileData(
     maximized #t
     win-size 1280 720
     """)
-logfile = setup_log(editor_name)
+log_file, config_file = setup_log(editor_name, True)
 
 base = ShowBase()
 
@@ -30,6 +30,6 @@ editor_definitions_paths = [
     ]
 
 from Frame.Frame import Frame
-Frame(editor_definitions_paths)
+Frame(editor_definitions_paths, log_file, config_file)
 
 base.run()

@@ -47,7 +47,7 @@ class Editor:
 
 
 class Frame(DirectObject, NodeEditorExtender):
-    def __init__(self, editor_definitions_paths):
+    def __init__(self, editor_definitions_paths, log_file, config_file):
         fn = Filename.fromOsSpecific(os.path.dirname(__file__))
         fn.makeTrueCase()
         self.icon_dir = str(fn) + "/"
@@ -113,21 +113,25 @@ class Frame(DirectObject, NodeEditorExtender):
                     editor_class_extra_args = editor.extra_args
 
             logging.debug(f"load editor: {editor}")
-            editor_frame = self.main_view.editor_selection.createEditorButton(
+            editor_frame = self.main_view.editor_selection.create_editor_button(
                 editor.icon,
                 editor.class_def,
                 self.tt,
                 editor.name,
+                log_file,
+                config_file,
                 editor_class_extra_args)
 
             if first_editor_frame is None:
                 first_editor_frame = editor_frame
 
-        es_ef = self.main_view.editor_selection.createEditorButton(
+        es_ef = self.main_view.editor_selection.create_editor_button(
             "icons/EditorSelectionStore.png",
             EditorStore,
             self.tt,
-            "Editor Store"
+            "Editor Store",
+            log_file,
+            config_file,
             )
 
         if first_editor_frame is not None:
