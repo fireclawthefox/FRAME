@@ -98,13 +98,13 @@ class MainView(DirectObject):
         return DirectFrame(
             frameSize=self.get_editor_frame_size(),
             frameColor=(0,0,0,0),
-            pos=(self.editor_selection.width, 0, 0))
+            pos=(self.editor_selection.width, 0, self.menuBarHeight))
 
     def get_editor_frame_size(self):
         return (
             0,
             base.get_size()[0] - self.editor_selection.width,
-            -base.get_size()[1] - self.menuBarHeight,
+            -base.get_size()[1] + self.menuBarHeight,
             0)
 
     def get_main_box_size(self):
