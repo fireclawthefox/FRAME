@@ -36,7 +36,13 @@ class MenuBar(DirectObject):
             ]
         self.project = self.__create_menu_item("Project", self.project_entries)
 
-        self.menu_bar.addItem(self.project)#, skipRefresh=True)
+        self.tools_entries = [
+            DirectMenuItemEntry("Run", base.messenger.send, ["FRAME_run_project"]),
+            ]
+        self.tools = self.__create_menu_item("Tools", self.tools_entries)
+
+        self.menu_bar.addItem(self.project, skipRefresh=True)
+        self.menu_bar.addItem(self.tools)#, skipRefresh=True)
 
     def __create_menu_item(self, text, entries):
         color = (

@@ -26,6 +26,7 @@ from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 from Frame.GUI.MainView import MainView
 from Frame.GUI.InternalEditors.EditorStore import EditorStore
 from Frame.core.FrameProject import FrameProject
+from Frame.core.PmanProject import PmanProject
 from Frame.Extensions.NodeEditor.NodeEditorExtender import NodeEditorExtender
 
 
@@ -143,6 +144,9 @@ class Frame(DirectObject, NodeEditorExtender):
 
         self.frameProject = FrameProject()
 
+        if ConfigVariableBool("use-pman-project", False).getValue():
+            self.pmanProject = PmanProject()
+
         self.enable_events()
 
     def load_editor_definition(self, editor_definition_file, root_path):
@@ -177,6 +181,8 @@ class Frame(DirectObject, NodeEditorExtender):
         self.accept("FRAME_quit_app", self.quit_app)
 
         self.accept("FRAME_new_project", self.new_project)
+        self.accept("FRAME_run_project", self.run_project)
+        self.accept("FRAME_load_project", self.load_project)
 
         self.accept("request_dirty_name", self.set_dirty_name)
         self.accept("request_clean_name", self.set_clean_name)
@@ -198,7 +204,10 @@ class Frame(DirectObject, NodeEditorExtender):
     def new_project(self):
         def selectProjectDirPath(confirm):
             if confirm:
-                self.frameProject.create_new_project(self.browser.get())
+                if ConfigVariableBool("use-pman-project", False).getValue():
+                    self.pmanProject.create_new_project(self.browser.get())
+                else:
+                    self.frameProject.create_new_project(self.browser.get())
             self.browser.hide()
             self.browser = None
         self.browser = DirectFolderBrowser(
@@ -208,6 +217,27 @@ class Frame(DirectObject, NodeEditorExtender):
             "",
             tooltip=self.tt)
         self.browser.show()
+
+    def load_project(self):
+        def selectProjectFilePath(confirm):
+            if confirm:
+                if ConfigVariableBool("use-pman-project", False).getValue():
+                    self.pmanProject.load_project(self.browser.get())
+                else:
+                    self.frameProject.load_project(self.browser.get())
+            self.browser.hide()
+            self.browser = None
+        self.browser = DirectFolderBrowser(
+            selectProjectFilePath,
+            False,
+            "",
+            "",
+            tooltip=self.tt)
+        self.browser.show()
+
+    def run_project(self):
+        if ConfigVariableBool("use-pman-project", False).getValue():
+            self.pmanProject.run_project()
 
     def __quit(self, selection):
         if selection == 1:
