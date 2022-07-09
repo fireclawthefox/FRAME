@@ -16,7 +16,7 @@ from panda3d.core import (
 
 from direct.showbase.DirectObject import DirectObject
 from direct.gui import DirectGuiGlobals as DGG
-from direct.gui.DirectDialog import OkCancelDialog
+from direct.gui.DirectDialog import OkCancelDialog, OkDialog
 from direct.gui.DirectFrame import DirectFrame
 
 from DirectGuiExtension.DirectTooltip import DirectTooltip
@@ -184,6 +184,8 @@ class Frame(DirectObject, NodeEditorExtender):
         self.accept("FRAME_run_project", self.run_project)
         self.accept("FRAME_load_project", self.load_project)
 
+        self.accept("FRAME_show_warning", self.show_warning)
+
         self.accept("request_dirty_name", self.set_dirty_name)
         self.accept("request_clean_name", self.set_clean_name)
 
@@ -238,6 +240,34 @@ class Frame(DirectObject, NodeEditorExtender):
     def run_project(self):
         if ConfigVariableBool("use-pman-project", False).getValue():
             self.pmanProject.run_project()
+        else:
+            self.frameProject.run_project()
+
+    def show_warning(self, warning):
+        def close_warning_dialog(decission):
+            self.dlg_warning.destroy()
+            self.dlg_warning_shadow.destroy()
+            self.dlg_warning = None
+            self.dlg_warning_shadow = None
+
+        self.dlg_warning = OkDialog(
+            text=warning,
+            state=DGG.NORMAL,
+            relief=DGG.RIDGE,
+            frameColor=(1,1,1,1),
+            scale=300,
+            pos=(base.getSize()[0]/2, 0, -base.getSize()[1]/2),
+            sortOrder=1,
+            button_relief=DGG.FLAT,
+            button_frameColor=(0.8, 0.8, 0.8, 1),
+            command=close_warning_dialog,
+            parent=base.pixel2d)
+        self.dlg_warning_shadow = DirectFrame(
+            state=DGG.NORMAL,
+            sortOrder=0,
+            frameColor=(0,0,0,0.5),
+            frameSize=(0, base.getSize()[0], -base.getSize()[1], 0),
+            parent=base.pixel2d)
 
     def __quit(self, selection):
         if selection == 1:
