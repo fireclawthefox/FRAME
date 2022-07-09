@@ -275,6 +275,10 @@ class EditorStore:
                 "Panda3DNodeEditor"),
             ":Core:",
             PackageStoreInfo(
+                "PMAN Project\nmanagment",
+                "A framework to create and manage Panda3D projects.",
+                "panda3d-pman"),
+            PackageStoreInfo(
                 "Direct GUI Extensions",
                 "Extension toolkit for Panda3Ds DirectGUI system\nImportant: Do not uninstall this, it is vital for FRAME.",
                 "DirectGuiExtension"),
