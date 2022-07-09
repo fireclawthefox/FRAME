@@ -1,6 +1,8 @@
 import os
+import sys
 import logging
 import shutil
+import subprocess
 from datetime import datetime
 
 FRAME_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -8,12 +10,16 @@ FRAME_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", 
 class FrameProject:
     def __init__(self):
         self.template_path = os.path.join(FRAME_ROOT_PATH, "templates")
+        self.project_path = ""
+        self.game_name = ""
 
     def create_new_project(self, root_path):
         if len(os.listdir(root_path)) != 0:
             logging.error("Selected directory for new project is not empty!")
+            base.messenger.send("FRAME_show_warning", ["Project creation failed!\nSelected directory for new project is not empty!"])
             return
         app_path = os.path.join(root_path, "gamename")
+        self.game_name = "gamename"
         os.mkdir(app_path)
         os.mkdir(os.path.join(app_path, "core"))
         os.mkdir(os.path.join(app_path, "assets"))
@@ -36,6 +42,19 @@ class FrameProject:
         self.__replace_placeholders(os.path.join(root_path, "setup.cfg"))
 
         self.__copy_code_templates(app_path)
+
+        self.project_path = root_path
+
+    def load_project(self, project_root_path):
+        self.game_name = "gamename"
+        self.project_path = project_root_path
+
+    def run_project(self):
+        main_path = os.path.join(self.project_path, self.game_name, "main.py")
+        print(f"RUNNING: {main_path}")
+        print(f"{sys.executable} {main_path}")
+        subprocess.call([sys.executable, main_path])
+
 
     def __copy_code_templates(self, app_path):
         shutil.copyfile(
