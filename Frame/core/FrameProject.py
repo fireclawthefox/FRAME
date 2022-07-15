@@ -3,6 +3,7 @@ import sys
 import logging
 import shutil
 import subprocess
+import json
 from datetime import datetime
 
 FRAME_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -12,16 +13,23 @@ class FrameProject:
         self.template_path = os.path.join(FRAME_ROOT_PATH, "templates")
         self.project_path = ""
         self.game_name = ""
+        self.template_type = ""
 
-    def create_new_project(self, root_path):
+    def create_new_project(
+            self,
+            root_path,
+            game_name="gamename",
+            template_type="simple"):
         if len(os.listdir(root_path)) != 0:
             logging.error("Selected directory for new project is not empty!")
-            base.messenger.send("FRAME_show_warning", ["Project creation failed!\nSelected directory for new project is not empty!"])
+            base.messenger.send(
+                "FRAME_show_warning",
+                ["Project creation failed!\nSelected directory for new project is not empty!"])
             return
-        app_path = os.path.join(root_path, "gamename")
-        self.game_name = "gamename"
+        app_path = os.path.join(root_path, game_name)
+        self.game_name = game_name
+        self.template_type = template_type
         os.mkdir(app_path)
-        os.mkdir(os.path.join(app_path, "core"))
         os.mkdir(os.path.join(app_path, "assets"))
 
         with open(os.path.join(root_path, "README.md"), "w") as readme_file:
@@ -43,20 +51,112 @@ class FrameProject:
 
         self.__copy_code_templates(app_path)
 
+        with open(os.path.join(root_path, "FRAME.project"), "w") as project_file:
+            project_json = {}
+            project_json["name"] = game_name
+            project_json["type"] = template_type
+            json.dump(project_json, project_file, indent=2)
+
         self.project_path = root_path
 
     def load_project(self, project_root_path):
         self.game_name = "gamename"
         self.project_path = project_root_path
+        project_file_path = os.path.join(root_path, "FRAME.project")
+        file_content = None
+        with open(project_file_path, 'r') as project_file:
+            try:
+                file_content = json.load(project_file)
+            except Exception as e:
+                logging.error(f"Couldn't load project file {project_file_path}")
+                logging.exception(e)
+                base.messenger.send(
+                    "FRAME_show_warning",
+                    ["Error while loading Project!\nPlease check log files for more information."])
+                return
+
+        if fileContent is None:
+            logging.error(f"Couldn't load project file {project_file_path}")
+            return
+
+        self.game_name = file_content["name"]
+
+    def run_server(self):
+        main_path = os.path.join(self.project_path, self.game_name, "server.py")
+        if not os.path.exists(main_path):
+            return
+        try:
+            subprocess.Popen([sys.executable, main_path])
+        except Exception as e:
+            logging.error("couldn't run server script of project!")
+            logging.exception(e)
+            base.messenger.send(
+                "FRAME_show_warning",
+                ["Can't run server."])
+            return
 
     def run_project(self):
         main_path = os.path.join(self.project_path, self.game_name, "main.py")
-        print(f"RUNNING: {main_path}")
-        print(f"{sys.executable} {main_path}")
+        if not os.path.exists(main_path):
+            return
         subprocess.call([sys.executable, main_path])
 
-
     def __copy_code_templates(self, app_path):
+        if self.template_type == "Multiplayer":
+            self.__copy_multiplayer_template(app_path)
+        else:
+            self.__copy_base_template(app_path)
+
+    def __copy_multiplayer_template(self, app_path):
+        #
+        # COPY CLIENT SIDE
+        #
+        os.mkdir(os.path.join(app_path, "client"))
+        os.mkdir(os.path.join(app_path, "client", "core"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "client", "core", "coreFSM.py"),
+            os.path.join(app_path, "client", "core", "coreFSM.py"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "client", "core", "config.py"),
+            os.path.join(app_path, "client", "core", "config.py"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "client", "ClientRepository.py"),
+            os.path.join(app_path, "client", "ClientRepository.py"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "main.py"),
+            os.path.join(app_path, "main.py"))
+
+        #
+        # COPY INTERFACES
+        #
+        os.mkdir(os.path.join(app_path, "interfaces"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "interfaces", "direct.dc"),
+            os.path.join(app_path, "interfaces", "direct.dc"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "interfaces", "game.dc"),
+            os.path.join(app_path, "interfaces", "game.dc"))
+
+        #
+        # COPY SERVER SIDE
+        #
+        os.mkdir(os.path.join(app_path, "server"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "server", "AIRepository.py"),
+            os.path.join(app_path, "server", "AIRepository.py"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "server", "ServerRepository.py"),
+            os.path.join(app_path, "server", "ServerRepository.py"))
+        shutil.copyfile(
+            os.path.join(self.template_path, "multiplayerProject", "dedicatedServer.py"),
+            os.path.join(app_path, "dedicatedServer.py"))
+
+        # EDIT PLACEHOLDERS
+        self.__replace_placeholders(os.path.join(app_path, "client", "core", "config.py"))
+
+    def __copy_base_template(self, app_path):
+        os.mkdir(os.path.join(app_path, "core"))
+
         shutil.copyfile(
             os.path.join(self.template_path, "baseProject", "coreFSM.py"),
             os.path.join(app_path, "core", "coreFSM.py"))
@@ -79,3 +179,6 @@ class FrameProject:
                     datetime.now().strftime("%y.%m"))
         with open(filename, "w") as edit_file:
             edit_file.write(content)
+
+    def close(self):
+        pass

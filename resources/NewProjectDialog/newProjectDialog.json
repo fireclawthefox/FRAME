@@ -1,0 +1,164 @@
+{
+  "ProjectVersion": "0.2a",
+  "EditorConfig": {
+    "usePixel2D": true,
+    "canvasSize": "(0, 1920, -1080, 0)"
+  },
+  "ComponentList": {
+    "frmCreateProject": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameSize": "(-250.0, 250.0, -150.0, 150.0)",
+        "frameColor": "(1, 1, 1, 1)",
+        "pos": "LPoint3f(646.167, 0, -460)",
+        "transparency": "0"
+      },
+      "type": "DirectFrame",
+      "parent": "root",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "btnOk": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "frameSize": "(-50.0, 50.0, -10.0, 25.0)",
+        "pos": "LPoint3f(75, 0, -125)",
+        "transparency": "0",
+        "text": "['OK']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    },
+    "btnCancel": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "frameSize": "(-50.0, 50.0, -10.0, 25.0)",
+        "pos": "LPoint3f(190, 0, -125)",
+        "transparency": "0",
+        "text": "['Cancel']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    },
+    "txtName": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(-125, 0, 100)",
+        "scale": "LVecBase3f(24, 24, 24)",
+        "transparency": "0",
+        "width": "15.0"
+      },
+      "type": "DirectEntry",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lblName": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-195, 0, 100)",
+        "transparency": "0",
+        "text": "['Name']",
+        "text0_scale": "(24, 24)"
+      },
+      "type": "DirectLabel",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lblProjectType": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-195, 0, 50)",
+        "transparency": "0",
+        "text": "['Type']",
+        "text0_scale": "(24, 24)"
+      },
+      "type": "DirectLabel",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lblProjectTemplate": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-195, 0, 0)",
+        "transparency": "0",
+        "text": "['Template']",
+        "text0_scale": "(24, 24)"
+      },
+      "type": "DirectLabel",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "projectType": {
+      "element": {
+        "borderWidth": "[0.0, 0.0]",
+        "pos": "LPoint3f(0, 0, 50)",
+        "scale": "LVecBase3f(24, 24, 24)",
+        "transparency": "0",
+        "items": "['FRAME']",
+        "popupMarker_pos": "None",
+        "text_align": "0",
+        "cancelframe_transparency": "0",
+        "item0_transparency": "0",
+        "popupMarker_transparency": "0",
+        "popupMenu_transparency": "0"
+      },
+      "type": "DirectOptionMenu",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "template": {
+      "element": {
+        "borderWidth": "[0.0, 0.0]",
+        "pos": "LPoint3f(0, 0, 0)",
+        "scale": "LVecBase3f(24, 24, 24)",
+        "transparency": "0",
+        "items": "['Simple']",
+        "popupMarker_pos": "None",
+        "text_align": "0",
+        "cancelframe_transparency": "0",
+        "item0_transparency": "0",
+        "popupMarker_transparency": "0",
+        "popupMenu_transparency": "0"
+      },
+      "type": "DirectOptionMenu",
+      "parent": "frmCreateProject",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    }
+  }
+}
