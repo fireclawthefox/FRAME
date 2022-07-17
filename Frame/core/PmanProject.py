@@ -16,7 +16,11 @@ class PmanProject:
         print(self.project_config)
         pman.run(self.project_config)
 
-    def load_project(self, project_root_path):
+    def run_server(self):
+        base.messenger.send("FRAME_show_warning", ["No a multiplayer project"])
+        return
+
+    def load(self, project_root_path):
         if not CAN_USE_PMAN: return
         self.project_config = pman.get_config(project_root_path)
 
@@ -33,5 +37,8 @@ class PmanProject:
         pman.create_project(root_path)
         self.project_config = pman.get_config(root_path)
 
-    def close(self):
+    def save(self):
         pass
+
+    def close(self):
+        self.project_config = None

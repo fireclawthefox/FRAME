@@ -31,6 +31,7 @@ class MenuBar(DirectObject):
             DirectMenuSeparator(),
             DirectMenuItemEntry("Open", base.messenger.send, ["FRAME_load_project"]),
             DirectMenuItemEntry("Save", base.messenger.send, ["FRAME_save_project"]),
+            DirectMenuItemEntry("Close", base.messenger.send, ["FRAME_close_project"]),
             DirectMenuSeparator(),
             DirectMenuItemEntry("Quit", base.messenger.send, ["FRAME_quit_app"]),
             ]
@@ -38,6 +39,7 @@ class MenuBar(DirectObject):
 
         self.tools_entries = [
             DirectMenuItemEntry("Run", base.messenger.send, ["FRAME_run_project"]),
+            DirectMenuItemEntry("Run Server", base.messenger.send, ["FRAME_run_project_server"]),
             ]
         self.tools = self.__create_menu_item("Tools", self.tools_entries)
 

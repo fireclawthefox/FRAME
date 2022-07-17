@@ -32,6 +32,7 @@ class NewProjectDialogHandler(NewProjectDialog):
 
             self.project_type = self.projectType.get()
             self.project_name = self.txtName.get()
+            self.project_company = self.txtCompany.get()
             self.project_template = self.template.get()
             print(self.project_type)
             print(self.project_template)

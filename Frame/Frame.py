@@ -178,7 +178,10 @@ class Frame(DirectObject, NodeEditorExtender):
 
         self.accept("FRAME_new_project", self.project_manager.new_project)
         self.accept("FRAME_run_project", self.project_manager.run_project)
-        self.accept("FRAME_load_project", self.project_manager.load_project)
+        self.accept("FRAME_run_project_server", self.project_manager.run_project_server)
+        self.accept("FRAME_load_project", self.project_manager.load)
+        self.accept("FRAME_save_project", self.project_manager.save)
+        self.accept("FRAME_close_project", self.project_manager.close)
 
         self.accept("FRAME_show_warning", self.show_warning)
 

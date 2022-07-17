@@ -32,6 +32,7 @@ class ProjectManager(DirectObject):
             self.project.create_new_project(
                 path,
                 self.newProjectDlg.project_name,
+                self.newProjectDlg.project_company,
                 self.newProjectDlg.project_template)
         self.newProjectDlg = None
 
@@ -41,7 +42,14 @@ class ProjectManager(DirectObject):
             return
         self.project.run_project()
 
-    def load_project(self):
+    def run_project_server(self):
+        if self.project is None:
+            base.messenger.send("FRAME_show_warning", ["No Project loaded"])
+            return
+
+        self.project.run_server()
+
+    def load(self):
         def select_project_path(confirm):
             if confirm:
                 if self.project is not None:
@@ -50,11 +58,11 @@ class ProjectManager(DirectObject):
                 if os.path.exists(os.path.join(path, ".pman")):
                     self.project_type = "pman"
                     self.project = PmanProject()
-                    self.project.load_project(self.browser.get())
+                    self.project.load(self.browser.get())
                 else:
                     self.project_type = "FRAME"
                     self.project = FrameProject()
-                    self.project.load_project(self.browser.get())
+                    self.project.load(self.browser.get())
             self.browser.hide()
             self.browser = None
         self.browser = DirectFolderBrowser(
@@ -64,6 +72,9 @@ class ProjectManager(DirectObject):
             "",
             tooltip=self.tt)
         self.browser.show()
+
+    def save(self):
+        self.project.save()
 
     def close(self):
         self.project.close()

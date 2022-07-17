@@ -19,7 +19,7 @@ from panda3d.core import (
 
 class GUI:
     def __init__(self, rootParent=None):
-
+        
         self.frmCreateProject = DirectFrame(
             borderWidth = (2, 2),
             frameSize = (-250.0, 250.0, -150.0, 150.0),
@@ -81,7 +81,7 @@ class GUI:
         self.lblProjectType = DirectLabel(
             borderWidth = (2, 2),
             frameColor = (0.8, 0.8, 0.8, 0.0),
-            pos = LPoint3f(-195, 0, 50),
+            pos = LPoint3f(-195, 0, 0),
             text = ['Type'],
             text0_scale = (24, 24),
             parent=self.frmCreateProject,
@@ -91,7 +91,7 @@ class GUI:
         self.lblProjectTemplate = DirectLabel(
             borderWidth = (2, 2),
             frameColor = (0.8, 0.8, 0.8, 0.0),
-            pos = LPoint3f(-195, 0, 0),
+            pos = LPoint3f(-195, 0, -50),
             text = ['Template'],
             text0_scale = (24, 24),
             parent=self.frmCreateProject,
@@ -100,7 +100,7 @@ class GUI:
 
         self.projectType = DirectOptionMenu(
             borderWidth = [0.0, 0.0],
-            pos = LPoint3f(0, 0, 50),
+            pos = LPoint3f(0, 0, 0),
             scale = LVecBase3f(24, 24, 24),
             items = ['FRAME'],
             popupMarker_pos = None,
@@ -111,7 +111,7 @@ class GUI:
 
         self.template = DirectOptionMenu(
             borderWidth = [0.0, 0.0],
-            pos = LPoint3f(0, 0, 0),
+            pos = LPoint3f(0, 0, -50),
             scale = LVecBase3f(24, 24, 24),
             items = ['Simple'],
             popupMarker_pos = None,
@@ -119,6 +119,25 @@ class GUI:
             parent=self.frmCreateProject,
         )
         self.template.setTransparency(0)
+
+        self.lblCompany = DirectLabel(
+            borderWidth = (2, 2),
+            frameColor = (0.8, 0.8, 0.8, 0.0),
+            pos = LPoint3f(-195, 0, 50),
+            text = ['Company'],
+            text0_scale = (24, 24),
+            parent=self.frmCreateProject,
+        )
+        self.lblCompany.setTransparency(0)
+
+        self.txtCompany = DirectEntry(
+            borderWidth = (0.08333333333333333, 0.08333333333333333),
+            pos = LPoint3f(-125, 0, 50),
+            scale = LVecBase3f(24, 24, 24),
+            width = 15.0,
+            parent=self.frmCreateProject,
+        )
+        self.txtCompany.setTransparency(0)
 
 
     def show(self):

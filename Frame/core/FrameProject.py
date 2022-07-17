@@ -13,12 +13,15 @@ class FrameProject:
         self.template_path = os.path.join(FRAME_ROOT_PATH, "templates")
         self.project_path = ""
         self.game_name = ""
+        self.company_name = ""
         self.template_type = ""
+        self.server_process = None
 
     def create_new_project(
             self,
             root_path,
             game_name="gamename",
+            company_name="Company Name",
             template_type="simple"):
         if len(os.listdir(root_path)) != 0:
             logging.error("Selected directory for new project is not empty!")
@@ -28,12 +31,13 @@ class FrameProject:
             return
         app_path = os.path.join(root_path, game_name)
         self.game_name = game_name
+        self.company_name = company_name
         self.template_type = template_type
         os.mkdir(app_path)
         os.mkdir(os.path.join(app_path, "assets"))
 
         with open(os.path.join(root_path, "README.md"), "w") as readme_file:
-            readme_file.write("# gamename\n\n")
+            readme_file.write(f"# {game_name}\n\n")
             readme_file.write("TODO: write me")
         with open(os.path.join(root_path, "LICENSE.txt"), "w") as license_file:
             license_file.write("TODO: Add license text!")
@@ -54,15 +58,16 @@ class FrameProject:
         with open(os.path.join(root_path, "FRAME.project"), "w") as project_file:
             project_json = {}
             project_json["name"] = game_name
+            project_json["company"] = company_name
             project_json["type"] = template_type
             json.dump(project_json, project_file, indent=2)
 
         self.project_path = root_path
 
-    def load_project(self, project_root_path):
-        self.game_name = "gamename"
+    def load(self, project_root_path):
+        self.close()
         self.project_path = project_root_path
-        project_file_path = os.path.join(root_path, "FRAME.project")
+        project_file_path = os.path.join(project_root_path, "FRAME.project")
         file_content = None
         with open(project_file_path, 'r') as project_file:
             try:
@@ -75,18 +80,32 @@ class FrameProject:
                     ["Error while loading Project!\nPlease check log files for more information."])
                 return
 
-        if fileContent is None:
+        if file_content is None:
             logging.error(f"Couldn't load project file {project_file_path}")
             return
 
-        self.game_name = file_content["name"]
+        self.game_name = file_content["name"] if "company" in file_content else "gamename"
+        self.game_name = file_content["company"] if "company" in file_content else "Company Name"
+        self.template_type = file_content["type"] if "type" in file_content else "Simple"
 
     def run_server(self):
-        main_path = os.path.join(self.project_path, self.game_name, "server.py")
+        if self.server_process is not None:
+            self.server_process.terminate()
+        if self.template_type != "Multiplayer":
+            base.messenger.send("FRAME_show_warning", ["Not a multiplayer project"])
+            return
+        main_path = os.path.join(self.project_path, self.game_name, "dedicatedServer.py")
         if not os.path.exists(main_path):
+            base.messenger.send("FRAME_show_warning", ["Server script not found"])
             return
         try:
-            subprocess.Popen([sys.executable, main_path])
+            print("RUN SERVER!")
+            self.server_process = subprocess.Popen(
+                [sys.executable, main_path],
+                stdout=subprocess.PIPE)
+            ret = self.server_process.poll()
+            print(ret)
+            print(self.server_process.stdout)
         except Exception as e:
             logging.error("couldn't run server script of project!")
             logging.exception(e)
@@ -173,12 +192,21 @@ class FrameProject:
         content = ""
         with open(filename, "r") as edit_file:
             content = edit_file.read()
-            content = content.replace("{{COMPANY_NAME}}", "Company Name")
-            content = content.replace("{{APP_NAME}}", "gamename")
+            content = content.replace("{{COMPANY_NAME}}", self.company_name)
+            content = content.replace("{{APP_NAME}}", self.game_name)
             content = content.replace("{{DATE_VERSION}}",
                     datetime.now().strftime("%y.%m"))
         with open(filename, "w") as edit_file:
             edit_file.write(content)
 
-    def close(self):
+    def save(self):
         pass
+
+    def close(self):
+        self.project_path = ""
+        self.game_name = ""
+        self.company_name = ""
+        self.template_type = ""
+        if self.server_process is not None:
+            self.server_process.terminate()
+        self.server_process = None
