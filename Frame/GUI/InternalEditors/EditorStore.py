@@ -153,6 +153,7 @@ class EditorEntry:
 
         self.btn_action["state"] = DGG.NORMAL
         if self.is_installed():
+            self.btn_remove["state"] = DGG.NORMAL
             if self.need_update():
                 self.btn_action["text"] = "Update"
                 self.btn_action["command"] = self.update
@@ -160,6 +161,7 @@ class EditorEntry:
                 self.btn_action["text"] = "Install"
                 self.btn_action["state"] = DGG.DISABLED
         else:
+            self.btn_remove["state"] = DGG.DISABLED
             self.btn_action["text"] = "Install"
             self.btn_action["command"] = self.install
 
@@ -170,6 +172,10 @@ class EditorEntry:
 
     def need_update(self):
         return self.package_data.name in self.outdated_packages_dict.keys()
+
+    def disable(self):
+        self.btn_action["state"] = DGG.DISABLED
+        self.btn_remove["state"] = DGG.DISABLED
 
 class EditorStore:
     def __init__(self, parent):
@@ -207,14 +213,11 @@ class EditorStore:
 
         self.main_sizer.setChild(self.store_frame)
 
-        #self.content_sizer = DirectAutoSizer(self.store_frame.canvas)
         self.content_box = DirectBoxSizer(
             self.store_frame.canvas,
             frameColor=(0,0,0,0),
-            orientation=DGG.VERTICAL,
-            #autoUpdateFrameSize=False
+            orientation=DGG.VERTICAL
             )
-        #self.content_sizer.setChild(self.content_box)
 
         self.lbl_loading = DirectLabel(
             self.store_frame,
@@ -300,6 +303,8 @@ class EditorStore:
                     PackageData(info.package_name),
                     self.update_package_info,
                     even)
+                # disable all entries at the start until data has been loaded
+                entry.disable()
                 self.entries.append(entry)
                 even = not even
 
@@ -310,11 +315,9 @@ class EditorStore:
         self.lbl_loading.show()
         self.installed_packages_gathered = False
         self.outdated_packages_gathered = False
-        taskMgr.doMethodLater(
-            0.5,
-            asyncio.run,
-            "gather packages",
-            extraArgs=[self.gather_all_packages()])
+
+        self.get_installed_packages()
+        self.get_outdated_packages()
 
     def update_entries(self):
         for entry in self.entries:
@@ -324,6 +327,7 @@ class EditorStore:
 
     def update_package_info_done(self):
         if self.installed_packages_gathered and self.outdated_packages_gathered:
+            self.update_entries()
             self.lbl_loading.hide()
 
     def __get_filtered_pip_data(self, package_string):
@@ -334,24 +338,49 @@ class EditorStore:
         # Check if the entry has the desired number of parts
         return filtered_list
 
-    async def get_pip_output_as_list(self, args_list):
-        cmd = " ".join([sys.executable, "-m", "pip"] + args_list)
-        proc = await asyncio.create_subprocess_shell(
-            cmd,
-            stdout=asyncio.subprocess.PIPE,
+    def get_pip_output_as_list_runner(self, task_name, args_list, callback_func):
+        if taskMgr.hasTaskNamed(task_name):
+            base.messenger.send(
+                "FRAME_show_warning",
+                ["This process is already running"])
+            return
+        task = taskMgr.add(self.get_pip_output_as_list_task, task_name)
+        task.proc = subprocess.Popen(
+            [sys.executable, "-m", "pip"] + args_list,
+            stdout=subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE)
+        task.callback_func = callback_func
 
-        stdout, stderr = await proc.communicate()
+    def get_pip_output_as_list_task(self, task):
+        if task.proc.poll() is None:
+            return task.cont
+
+        if task.proc.poll() == 0:
+            if task.proc.stdout:
+                stdout = task.proc.stdout.read()
+            if task.proc.stderr:
+                stderr = task.proc.stderr.read()
 
         ret_list = []
         if stdout:
             ret_list = stdout.decode().split("\n")[2:]
-        return ret_list
 
-    async def get_installed_packages(self):
-        output_list = await self.get_pip_output_as_list(["list"])
+        if stderr:
+            logging.error(stderr.decode())
+
+        task.callback_func(ret_list)
+
+        return task.done
+
+    def get_installed_packages(self):
+        self.get_pip_output_as_list_runner(
+            "get-installed-packages-task",
+            ["list"],
+            self.get_installed_packages_callback)
+
+    def get_installed_packages_callback(self, value):
         self.installed_packages_dict = {}
-        for package in output_list:
+        for package in value:
             filtered_list = self.__get_filtered_pip_data(package)
             # Check if the entry has the desired number of parts
             if len(filtered_list) < 2:
@@ -362,15 +391,19 @@ class EditorStore:
                 filtered_list[1],
                 "")
             self.installed_packages_dict[filtered_list[0]] = data
-        self.update_entries()
+
         self.installed_packages_gathered = True
         self.update_package_info_done()
 
+    def get_outdated_packages(self):
+        self.get_pip_output_as_list_runner(
+            "get-outdated-packages-task",
+            ["list", "-o"],
+            self.get_outdated_packages_callback)
 
-    async def get_outdated_packages(self):
-        output_list = await self.get_pip_output_as_list(["list", "-o"])
+    def get_outdated_packages_callback(self, value):
         self.outdated_packages_dict = {}
-        for package in output_list:
+        for package in value:
             filtered_list = self.__get_filtered_pip_data(package)
             if len(filtered_list) < 3:
                 continue
@@ -380,15 +413,8 @@ class EditorStore:
                 filtered_list[2])
             self.outdated_packages_dict[filtered_list[0]] = data
 
-        self.update_entries()
         self.outdated_packages_gathered = True
         self.update_package_info_done()
-
-    async def gather_all_packages(self):
-        get_installed_task = asyncio.create_task(self.get_installed_packages())
-        get_outdated_task = asyncio.create_task(self.get_outdated_packages())
-        await get_installed_task
-        await get_outdated_task
 
     def is_dirty(self):
         return False
