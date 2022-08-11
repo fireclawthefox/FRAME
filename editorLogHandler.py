@@ -7,13 +7,12 @@ from logging import StreamHandler
 
 
 from panda3d.core import (
-    loadPrcFileData,
     loadPrcFile,
     Filename,
     ConfigVariableBool,
 )
 
-def setup_log(editor_name, log_to_console=False):
+def setup_log(editor_name, log_to_console=False, log_level=logging.DEBUG):
     # check if we have a config file
     home = os.path.expanduser("~")
     basePath = os.path.join(home, f".{editor_name}")
@@ -39,14 +38,14 @@ def setup_log(editor_name, log_to_console=False):
 
     log_file = os.path.join(logPath, f"{editor_name}.log")
     handler = TimedRotatingFileHandler(log_file)
-    consoleHandler = StreamHandler()
 
     logHandlers = [handler]
     if log_to_console:
+        consoleHandler = StreamHandler()
         logHandlers.append(consoleHandler)
 
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=log_level,
         handlers=logHandlers)
 
     for root, dirs, files in os.walk(basePath):
