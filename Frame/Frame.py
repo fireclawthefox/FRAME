@@ -177,11 +177,19 @@ class Frame(DirectObject, NodeEditorExtender):
         self.accept("FRAME_quit_app", self.quit_app)
 
         self.accept("FRAME_new_project", self.project_manager.new_project)
-        self.accept("FRAME_run_project", self.project_manager.run_project)
-        self.accept("FRAME_run_project_server", self.project_manager.run_project_server)
         self.accept("FRAME_load_project", self.project_manager.load)
         self.accept("FRAME_save_project", self.project_manager.save)
         self.accept("FRAME_close_project", self.project_manager.close)
+
+        self.accept("FRAME_run_project", self.project_manager.run_project)
+        self.accept("FRAME_stop_project", self.project_manager.stop_project)
+        self.accept("FRAME_run_project_server", self.project_manager.run_project_server)
+        self.accept("FRAME_stop_project_server", self.project_manager.stop_project_server)
+
+        self.accept("FRAME_show_terminal_window", self.main_view.show_terminal_window)
+        self.accept("FRAME_hide_terminal_window", self.main_view.hide_terminal_window)
+
+        self.accept("FRAME_add_terminal_process", self.main_view.terminal_window.add_terminal)
 
         self.accept("FRAME_show_warning", self.show_warning)
 
@@ -221,6 +229,7 @@ class Frame(DirectObject, NodeEditorExtender):
             button_frameColor=(0.8, 0.8, 0.8, 1),
             command=close_warning_dialog,
             parent=base.pixel2d)
+        self.dlg_warning.set_bin("gui-popup", 0)
         self.dlg_warning_shadow = DirectFrame(
             state=DGG.NORMAL,
             sortOrder=0,
@@ -230,6 +239,10 @@ class Frame(DirectObject, NodeEditorExtender):
 
     def __quit(self, selection):
         if selection == 1:
+            try:
+                self.main_view.terminal_window.close_all()
+            except:
+                logging.error("Failed to close all terminals. Remaining processes may still exist.", exc_info=(ex_type, ex_value, ex_traceback))
             base.userExit()
         else:
             self.dlg_quit.destroy()
@@ -255,6 +268,7 @@ class Frame(DirectObject, NodeEditorExtender):
             button_frameColor=(0.8, 0.8, 0.8, 1),
             command=self.__quit,
             parent=base.pixel2d)
+        self.dlg_quit.set_bin("gui-popup", 0)
         self.dlg_quit_shadow = DirectFrame(
             state=DGG.NORMAL,
             sortOrder=0,
@@ -273,4 +287,12 @@ class Frame(DirectObject, NodeEditorExtender):
         #print("Try to save project after unhandled exception. Please restart FRAME to automatically load the exception save file!")
 
         for editor_frame in self.main_view.editor_selection.editor_frames:
-            editor_frame.editor_instance.do_exception_save()
+            try:
+                editor_frame.editor_instance.do_exception_save()
+            except:
+                logging.error("Failed to save exception save", exc_info=(ex_type, ex_value, ex_traceback))
+
+        try:
+            self.main_view.terminal_window.close_all()
+        except:
+            logging.error("Failed to close all terminals. Remaining processes may still exist.", exc_info=(ex_type, ex_value, ex_traceback))

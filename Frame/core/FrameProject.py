@@ -15,6 +15,7 @@ class FrameProject:
         self.game_name = ""
         self.company_name = ""
         self.template_type = ""
+        self.client_process = None
         self.server_process = None
 
     def create_new_project(
@@ -84,18 +85,18 @@ class FrameProject:
             logging.error(f"Couldn't load project file {project_file_path}")
             return
 
-        self.game_name = file_content["name"] if "company" in file_content else "gamename"
-        self.game_name = file_content["company"] if "company" in file_content else "Company Name"
+        self.game_name = file_content["name"] if "name" in file_content else "gamename"
+        self.company_name = file_content["company"] if "company" in file_content else "Company Name"
         self.template_type = file_content["type"] if "type" in file_content else "Simple"
 
     def run_server(self):
-        if self.server_process is not None:
-            self.server_process.terminate()
+        self.stop_server()
         if self.template_type != "Multiplayer":
             base.messenger.send("FRAME_show_warning", ["Not a multiplayer project"])
             return
         main_path = os.path.join(self.project_path, self.game_name, "dedicatedServer.py")
         if not os.path.exists(main_path):
+            print(main_path)
             base.messenger.send("FRAME_show_warning", ["Server script not found"])
             return
         try:
@@ -103,9 +104,11 @@ class FrameProject:
             self.server_process = subprocess.Popen(
                 [sys.executable, main_path],
                 stdout=subprocess.PIPE)
-            ret = self.server_process.poll()
-            print(ret)
-            print(self.server_process.stdout)
+            #ret = self.server_process.poll()
+
+            base.messenger.send("FRAME_add_terminal_process", ["Server", self.server_process, "FRAME_stop_project_server"])
+            #print(ret)
+            #print(self.server_process.stdout)
         except Exception as e:
             logging.error("couldn't run server script of project!")
             logging.exception(e)
@@ -114,11 +117,35 @@ class FrameProject:
                 ["Can't run server."])
             return
 
+    def stop_server(self):
+        if self.server_process is not None:
+            self.server_process.terminate()
+            try:
+                self.server_process.communicate()
+            except Exception as e:
+                # this process is probalby already gone
+                pass
+        self.server_process = None
+
     def run_project(self):
         main_path = os.path.join(self.project_path, self.game_name, "main.py")
         if not os.path.exists(main_path):
             return
-        subprocess.call([sys.executable, main_path])
+        self.client_process = subprocess.Popen(
+            [sys.executable, main_path],
+            stdout=subprocess.PIPE)
+
+        base.messenger.send("FRAME_add_terminal_process", ["App", self.client_process, "FRAME_stop_project"])
+
+    def stop_project(self):
+        if self.client_process is not None:
+            self.client_process.terminate()
+            try:
+                self.client_process.communicate()
+            except Exception as e:
+                # this process is probalby already gone
+                pass
+        self.client_process = None
 
     def __copy_code_templates(self, app_path):
         if self.template_type == "Multiplayer":

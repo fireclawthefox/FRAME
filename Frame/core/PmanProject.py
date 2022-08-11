@@ -16,8 +16,14 @@ class PmanProject:
         print(self.project_config)
         pman.run(self.project_config)
 
+    def stop_project(self):
+        return
+
     def run_server(self):
         base.messenger.send("FRAME_show_warning", ["No a multiplayer project"])
+        return
+
+    def stop_server(self):
         return
 
     def load(self, project_root_path):

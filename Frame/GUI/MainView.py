@@ -11,6 +11,7 @@ from DirectGuiExtension.DirectAutoSizer import DirectAutoSizer
 from Frame.GUI.MenuBar import MenuBar
 from Frame.GUI.EditorSelection import EditorSelection
 
+from Frame.GUI.Terminal.TerminalWindow import TerminalWindow
 
 class MainView(DirectObject):
     def __init__(self):
@@ -76,7 +77,6 @@ class MainView(DirectObject):
         self.menu_bar_sizer.setChild(self.menu_bar.menu_bar)
         self.menu_bar_sizer["childUpdateSizeFunc"] = self.menu_bar.menu_bar.refresh
 
-
         self.editor_selection = EditorSelection(-self.menuBarHeight)
         self.editor_box.addItem(self.editor_selection.editor_selection)
 
@@ -84,8 +84,24 @@ class MainView(DirectObject):
         self.editor_selection.set_editor_holder_frame(self.editor_frame)
         self.editor_box.addItem(self.editor_frame)
 
+        self.terminal_window = TerminalWindow(frameSize=(-1,1,-1,1))
+        self.terminal_window_sizer = DirectAutoSizer(
+            frameColor=(0,0,0,0),
+            pos=(0,0,-1),
+            child=self.terminal_window,
+            frameSize=(-1,1,-1,1),
+            extendVertical=False,
+            childUpdateSizeFunc=self.terminal_window.refresh)
+        self.terminal_window_sizer.set_bin("gui-popup", 0)
+
         self.is_setup_done = True
         self.main_box.refresh()
+
+    def show_terminal_window(self):
+        self.terminal_window.slide_in()
+
+    def hide_terminal_window(self):
+        self.terminal_window.slide_out()
 
     def refresh_content_area(self):
         if not self.is_setup_done:

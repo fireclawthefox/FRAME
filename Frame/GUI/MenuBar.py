@@ -38,8 +38,12 @@ class MenuBar(DirectObject):
         self.project = self.__create_menu_item("Project", self.project_entries)
 
         self.tools_entries = [
-            DirectMenuItemEntry("Run", base.messenger.send, ["FRAME_run_project"]),
+            DirectMenuItemEntry("Run Project", base.messenger.send, ["FRAME_run_project"]),
+            DirectMenuItemEntry("Stop Project", base.messenger.send, ["FRAME_stop_project"]),
             DirectMenuItemEntry("Run Server", base.messenger.send, ["FRAME_run_project_server"]),
+            DirectMenuItemEntry("Stop Server", base.messenger.send, ["FRAME_stop_project_server"]),
+            DirectMenuItemEntry("Show Terminals", base.messenger.send, ["FRAME_show_terminal_window"]),
+            DirectMenuItemEntry("Hide Terminals", base.messenger.send, ["FRAME_hide_terminal_window"]),
             ]
         self.tools = self.__create_menu_item("Tools", self.tools_entries)
 

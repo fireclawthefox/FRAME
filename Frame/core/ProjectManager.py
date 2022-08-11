@@ -42,6 +42,13 @@ class ProjectManager(DirectObject):
             return
         self.project.run_project()
 
+    def stop_project(self):
+        if self.project is None:
+            base.messenger.send("FRAME_show_warning", ["No Project loaded"])
+            return
+
+        self.project.stop_project()
+
     def run_project_server(self):
         if self.project is None:
             base.messenger.send("FRAME_show_warning", ["No Project loaded"])
@@ -49,20 +56,18 @@ class ProjectManager(DirectObject):
 
         self.project.run_server()
 
+    def stop_project_server(self):
+        if self.project is None:
+            base.messenger.send("FRAME_show_warning", ["No Project loaded"])
+            return
+
+        self.project.stop_server()
+
     def load(self):
         def select_project_path(confirm):
             if confirm:
-                if self.project is not None:
-                    self.close()
                 path = self.browser.get()
-                if os.path.exists(os.path.join(path, ".pman")):
-                    self.project_type = "pman"
-                    self.project = PmanProject()
-                    self.project.load(self.browser.get())
-                else:
-                    self.project_type = "FRAME"
-                    self.project = FrameProject()
-                    self.project.load(self.browser.get())
+                self.open_project(path)
             self.browser.hide()
             self.browser = None
         self.browser = DirectFolderBrowser(
@@ -72,6 +77,18 @@ class ProjectManager(DirectObject):
             "",
             tooltip=self.tt)
         self.browser.show()
+
+    def open_project(self, project_path):
+        if self.project is not None:
+            self.close()
+        if os.path.exists(os.path.join(project_path, ".pman")):
+            self.project_type = "pman"
+            self.project = PmanProject()
+            self.project.load(project_path)
+        else:
+            self.project_type = "FRAME"
+            self.project = FrameProject()
+            self.project.load(project_path)
 
     def save(self):
         self.project.save()
