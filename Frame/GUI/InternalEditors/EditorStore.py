@@ -8,6 +8,7 @@ from DirectGuiExtension import DirectGuiHelper as DGH
 import subprocess
 import asyncio
 import sys
+import logging
 from dataclasses import dataclass
 from panda3d.core import TextNode
 
