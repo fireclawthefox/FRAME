@@ -5,7 +5,7 @@
     "configToEnable":"frame-enable-gui-editor",
     "order":20,
     "icon":"EditorSelectionGD.png",
-    "fileExtension":".ui",
+    "fileExtension":".gui",
     "extraArgsFunc":"",
     "extraArgs":[]
 }
