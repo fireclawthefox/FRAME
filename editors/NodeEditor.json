@@ -1,6 +1,6 @@
 {
     "name":"Logic Editor",
-    "module":"NodeEditor.NodeEditor",
+    "module":"Panda3DNodeEditor.NodeEditor",
     "class":"NodeEditor",
     "configToEnable":"frame-enable-node-editor",
     "order":30,
