@@ -141,10 +141,16 @@ class PythonExporter:
     def __create_script_call(self, node):
         code_part = CodePart()
         script_node = self.__find_node_in_connection(node, "Script")
-        script_code_part = self.__get_or_create_code_part(script_node)
+        script_code_part = None
+        if script_node is not None:
+            script_code_part = self.__get_or_create_code_part(script_node)
         if script_code_part is None:
-            return None
-        code_part.snippet = f"{script_code_part.variable}.{node.inputList[1].getValue()}()"
+            if node.inputList[0].getValue() != "":
+                code_part.snippet = f"{node.inputList[0].getValue()}.{node.inputList[1].getValue()}()"
+            else:
+                code_part.snippet = f"self.{node.inputList[1].getValue()}()"
+        else:
+            code_part.snippet = f"{script_code_part.variable}.{node.inputList[1].getValue()}()"
         code_part.write_snippet = False
         return code_part
 
@@ -164,8 +170,8 @@ class PythonExporter:
         classname = classname[0].upper() + classname[1:]
         code_part.imports = f"from {modules} import {classname}"
         var_name = classname[0].lower() + classname[1:]
-        code_part.init_snippet = f"{var_name} = {classname}()"
-        code_part.variable = var_name
+        code_part.init_snippet = f"self.{var_name} = {classname}()"
+        code_part.variable = f"self.{var_name}"
         return code_part
 
     def __find_node_in_connection(self, connected_with_node, node_type):
