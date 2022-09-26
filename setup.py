@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pand3d-frame",
+    name="panda3d-frame",
     version="22.09",
     author="Fireclaw",
     author_email="fireclawthefox@gmail.com",
