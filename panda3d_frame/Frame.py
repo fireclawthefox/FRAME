@@ -23,10 +23,10 @@ from DirectGuiExtension.DirectTooltip import DirectTooltip
 
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
-from Frame.GUI.MainView import MainView
-from Frame.GUI.InternalEditors.EditorStore import EditorStore
-from Frame.core.ProjectManager import ProjectManager
-from Frame.Extensions.NodeEditor.NodeEditorExtender import NodeEditorExtender
+from panda3d_frame.GUI.MainView import MainView
+from panda3d_frame.GUI.InternalEditors.EditorStore import EditorStore
+from panda3d_frame.core.ProjectManager import ProjectManager
+from panda3d_frame.Extensions.NodeEditor.NodeEditorExtender import NodeEditorExtender
 
 
 @dataclass

@@ -1,4 +1,4 @@
-from Frame.GUI.ProjectManagement.NewProjectDialog import GUI as NewProjectDialog
+from panda3d_frame.GUI.ProjectManagement.NewProjectDialog import GUI as NewProjectDialog
 from panda3d.core import ConfigVariableBool
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 

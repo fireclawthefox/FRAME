@@ -1,0 +1,3 @@
+include Frame/editors/*.png
+include Frame/editors/*.json
+recursive-include Frame/templates/ *

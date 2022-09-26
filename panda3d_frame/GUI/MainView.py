@@ -8,10 +8,10 @@ from direct.gui.DirectFrame import DirectFrame
 from DirectGuiExtension.DirectBoxSizer import DirectBoxSizer
 from DirectGuiExtension.DirectAutoSizer import DirectAutoSizer
 
-from Frame.GUI.MenuBar import MenuBar
-from Frame.GUI.EditorSelection import EditorSelection
+from panda3d_frame.GUI.MenuBar import MenuBar
+from panda3d_frame.GUI.EditorSelection import EditorSelection
 
-from Frame.GUI.Terminal.TerminalWindow import TerminalWindow
+from panda3d_frame.GUI.Terminal.TerminalWindow import TerminalWindow
 
 class MainView(DirectObject):
     def __init__(self):

@@ -7,7 +7,7 @@ See License.txt or http://opensource.org/licenses/BSD-2-Clause for more info
 """
 
 from Panda3DNodeEditor.NodeCore.Nodes.NodeBase import NodeBase
-from Frame.Extensions.NodeEditor.Sockets.TextSocket import TextSocket
+from panda3d_frame.Extensions.NodeEditor.Sockets.TextSocket import TextSocket
 
 class Node(NodeBase):
     def __init__(self, parent):

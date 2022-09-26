@@ -1,4 +1,4 @@
-from Frame.GUI.Terminal.Terminal import Terminal
+from panda3d_frame.GUI.Terminal.Terminal import Terminal
 from DirectGuiExtension.DirectAutoSizer import DirectAutoSizer
 from DirectGuiExtension.DirectTabbedFrame import DirectTabbedFrame
 from direct.interval.IntervalGlobal import Sequence, Func

@@ -1,8 +1,8 @@
 import os
 from direct.showbase.DirectObject import DirectObject
-from Frame.GUI.ProjectManagement.NewProjectDialogHandler import NewProjectDialogHandler
-from Frame.core.FrameProject import FrameProject
-from Frame.core.PmanProject import PmanProject
+from panda3d_frame.GUI.ProjectManagement.NewProjectDialogHandler import NewProjectDialogHandler
+from panda3d_frame.core.FrameProject import FrameProject
+from panda3d_frame.core.PmanProject import PmanProject
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
 class ProjectManager(DirectObject):
