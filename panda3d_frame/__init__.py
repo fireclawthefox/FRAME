@@ -34,7 +34,7 @@ base = ShowBase()
 home = os.path.expanduser("~")
 editor_definitions_paths = [
     os.path.join(home, f".{editor_name}", "editors"),
-    os.path.join(base.main_dir, "Frame", "editors")
+    os.path.join(base.main_dir, "panda3d_frame", "editors")
     ]
 
 from .Frame import Frame

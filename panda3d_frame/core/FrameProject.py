@@ -12,7 +12,7 @@ from panda3d.core import Filename
 class FrameProject:
     def __init__(self):
         main_dir = Filename(base.main_dir).to_os_specific()
-        self.template_path = os.path.join(main_dir, "Frame", "templates")
+        self.template_path = os.path.join(main_dir, "panda3d_frame", "templates")
         self.project_path = ""
         self.game_name = ""
         self.company_name = ""
