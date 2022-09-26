@@ -7,12 +7,12 @@ import json
 from datetime import datetime
 from panda3d.core import Filename
 
-#FRAME_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+FRAME_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 class FrameProject:
     def __init__(self):
         main_dir = Filename(base.main_dir).to_os_specific()
-        self.template_path = os.path.join(main_dir, "panda3d_frame", "templates")
+        self.template_path = os.path.join(FRAME_ROOT_PATH, "templates")
         self.project_path = ""
         self.game_name = ""
         self.company_name = ""
