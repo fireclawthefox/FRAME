@@ -290,6 +290,10 @@ class EditorStore:
                 "Folder Browser",
                 "A folder browser extension for DirectGUI\nImportant: Do not uninstall this, it is vital for FRAME.",
                 "DirectFolderBrowser"),
+            PackageStoreInfo(
+                "Panda3D",
+                "The game engine running behind FRAME and which is useds\nto power game created with FRAME.\nImportant: Do not uninstall this, it is vital for FRAME.",
+                "Panda3D"),
         ]
 
         even = False
