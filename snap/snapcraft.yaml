@@ -1,0 +1,25 @@
+name: panda3d-frame
+base: core20
+version: '22.09'
+summary: The FRee Adaptable Modular Editor for Panda3D.
+description: |
+    This application gives home to multiple editors like a scene editor,
+    gui editor and many others to come. It will automatically embed
+    installed and supported editors.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+compression: lzo
+
+apps:
+    panda3d-frame:
+        command: panda3d-frame
+        plugs: [home, removable-media]
+
+parts:
+    panda3d-frame:
+        plugin: python
+        source: https://github.com/fireclawthefox/FRAME.git
+        stage-packages:
+        - libfreetype6
+        - libpng16-16

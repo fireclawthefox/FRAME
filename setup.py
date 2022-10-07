@@ -33,8 +33,11 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     entry_points={
+        'console_scripts': [
+            'panda3d-frame = panda3d_frame:main',
+        ],
         'gui_scripts': [
-            'panda3d-frame = panda3d_frame',
+            'panda3d-frame = panda3d_frame:main',
         ]
     }
 )
