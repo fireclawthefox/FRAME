@@ -18,7 +18,19 @@ Currently the FRAME editor doesn't have an installer yet. Running from source on
 3. run FRAMEs main.py (see below)
 
 ## Run FRAME
-To run the editor, call `python3 main.py` from within the FRAME editor folder. Dependent on your installation of python, the call may differ slightly with for example leaving out the 3 at the end of python3 or adding .exe for running on windows.
+### Installing
+To install the editor from source, run the following:
+`python3 setup.py install --user`
+This will install the application into your python site packages
+Then just run it from the terminal like this:
+`panda3d-frame`
+
+### From source
+To run the editor directly from source, call
+`python3 -m panda3d_frame.__init__`
+from within the FRAME editor folder.
+
+Dependent on your installation of python, the call may differ slightly with for example leaving out the 3 at the end of python3 or adding .exe for running on windows.
 
 ## Official Editors
 Official editors of the FRAME can be installed through the FRAMES editor store page. Currently those include the following:
