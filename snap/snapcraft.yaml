@@ -1,6 +1,6 @@
 name: panda3d-frame
-base: core20
-version: '22.09'
+base: core22
+version: '22.10'
 summary: The FRee Adaptable Modular Editor for Panda3D.
 description: |
     This application gives home to multiple editors like a scene editor,
@@ -8,18 +8,33 @@ description: |
     installed and supported editors.
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict # use 'strict' once you have the right plugs and slots
 compression: lzo
 
 apps:
     panda3d-frame:
-        command: panda3d-frame
-        plugs: [home, removable-media]
+        command: bin/panda3d-frame
+        #desktop: snap/local/panda3d-frame.desktop
+        plugs:
+        # file handling
+        - home
+        - removable-media
+        # visual
+        - opengl
+        # audio
+        - alsa
+        - audio-playback
+        #- audio-record
 
 parts:
     panda3d-frame:
         plugin: python
-        source: https://github.com/fireclawthefox/FRAME.git
+        python-requirements:
+          - snap/local/requirements_snap.txt
+        source: . #https://github.com/fireclawthefox/FRAME.git
         stage-packages:
         - libfreetype6
         - libpng16-16
+        - libgl1
+        - libpulse0
+        - libasound2

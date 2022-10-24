@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="panda3d-frame",
-    version="22.09",
+    version="22.10",
     author="Fireclaw",
     author_email="fireclawthefox@gmail.com",
     description="A visual game editor for the Panda3D engine",

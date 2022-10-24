@@ -1,0 +1,13 @@
+# https://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.1.html
+
+[Desktop Entry]
+Type=Application
+Version=1.1
+Name=Panda3D Frame
+GenericName=Visual Game Designer
+Comment=A visual game development environment for the Panda3D game engine
+Icon=${SNAP}/meta/gui/panda3d-frame.png
+Exec=panda3d-frame
+Terminal=false
+Categories=Development;Graphics;Building;GUIDesigner;3DGraphics
+Keywords=gamedev;panda3d;3D;designer

@@ -1,0 +1,7 @@
+panda3d>=1.10.11
+DirectFolderBrowser
+DirectGuiExtension>=22.09
+SceneEditor
+DirectGuiDesigner
+Panda3DNodeEditor
+panda3d-pman
