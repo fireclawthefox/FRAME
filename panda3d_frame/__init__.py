@@ -41,8 +41,6 @@ def main():
     from .Frame import Frame
     f = Frame(editor_definitions_paths, log_file, config_file)
 
-    f.project_manager.open_project("/home/fireclaw/FRAMETests/My Multiplayer Project/")
-
     base.run()
 
 if __name__ == "__main__":
