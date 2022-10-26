@@ -26,47 +26,19 @@ class PythonExporter:
         self.indent = "    "
         self.indent_count = 2
         self.node_code_dict = {}
-        self.browser = DirectFolderBrowser(self.save, True, defaultFilename="newModule.py")
+        self.browser = DirectFolderBrowser(self.save, True, defaultFilename="newModule.py", askForOverwrite=True)
 
     def save(self, doSave):
         if doSave:
-            self.dlg_overwrite = None
-            self.dlg_overwrite_shadow = None
             path = self.browser.get()
             path = os.path.expanduser(path)
             path = os.path.expandvars(path)
-            if os.path.exists(path):
-                self.dlg_overwrite = YesNoDialog(
-                    text="File already Exist.\nOverwrite?",
-                    relief=DGG.RIDGE,
-                    frameColor=(1,1,1,1),
-                    frameSize=(-0.5,0.5,-0.3,0.2),
-                    sortOrder=1,
-                    button_relief=DGG.FLAT,
-                    button_frameColor=(0.8, 0.8, 0.8, 1),
-                    command=self.__execute_save,
-                    extraArgs=[path],
-                    scale=300,
-                    pos=(base.getSize()[0]/2, 0, -base.getSize()[1]/2),
-                    parent=base.pixel2d)
-                self.dlg_overwrite_shadow = DirectFrame(
-                    pos=(base.getSize()[0]/2 + 10, 0, -base.getSize()[1]/2 - 10),
-                    sortOrder=0,
-                    frameColor=(0,0,0,0.5),
-                    frameSize=self.dlg_overwrite.bounds,
-                    scale=300,
-                    parent=base.pixel2d)
-            else:
-                self.__execute_save(True, path)
+            self.__execute_save(path)
             base.messenger.send("setLastPath", [path])
         self.browser.destroy()
         del self.browser
 
-    def __execute_save(self, overwrite, path):
-        if self.dlg_overwrite is not None: self.dlg_overwrite.destroy()
-        if self.dlg_overwrite_shadow is not None: self.dlg_overwrite_shadow.destroy()
-        if not overwrite: return
-
+    def __execute_save(self, path):
         leaf_nodes = []
         for node in self.nodes:
             if node.isLeaveNode():
@@ -127,6 +99,8 @@ class PythonExporter:
             code_part = self.__create_catch_event(node)
         elif node.name == "Script":
             code_part = self.__create_load_script(node)
+        elif node.name == "Set Variable":
+            code_part = self.__create_set_variable(node)
 
         if code_part is not None:
             self.node_code_dict[node] = code_part
@@ -185,3 +159,8 @@ class PythonExporter:
                     if connector.socketA.node.name == node_type:
                         return connector.socketA.node
         return None
+
+    def __create_set_variable(self, node):
+        code_part = CodePart()
+        code_part.variable = f"self.{node.inputList[0].getValue()}"
+        code_part.snippet = f"self.{node.inputList[0].getValue()} = {node.outputList[0].getValue()}"
