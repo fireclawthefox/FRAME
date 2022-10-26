@@ -160,7 +160,8 @@ class Frame(DirectObject, NodeEditorExtender):
                     class_def,
                     edf_content["configToEnable"],
                     edf_content["order"],
-                    os.path.join(root_path, edf_content["icon"]),
+                    Filename.fromOsSpecific(
+                        os.path.join(root_path, edf_content["icon"])).getFullpath(),
                     edf_content["fileExtension"]
                     if "fileExtension" in edf_content else "",
                     edf_content["extraArgsFunc"]
