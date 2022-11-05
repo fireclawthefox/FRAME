@@ -1,4 +1,4 @@
 include panda3d_frame/editors/*.png
 include panda3d_frame/editors/*.json
-recursive-include panda3d_frame/ *.png
-recursive-include panda3d_frame/templates/ *
+recursive-include panda3d_frame *.png
+recursive-include panda3d_frame/templates *
