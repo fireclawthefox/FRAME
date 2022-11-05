@@ -1,3 +1,3 @@
 panda3d>=1.10.11
-DirectFolderBrowser
-DirectGuiExtension>=22.09
+DirectFolderBrowser>=22.10
+DirectGuiExtension>=22.10
