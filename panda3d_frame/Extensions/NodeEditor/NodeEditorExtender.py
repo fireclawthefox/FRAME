@@ -1,5 +1,6 @@
 
 try:
+    from panda3d_frame.Extensions.NodeEditor.Nodes.PyVariableNode import Node as PyVariableNode
     from panda3d_frame.Extensions.NodeEditor.Nodes.P3DEventNode import Node as P3DEventNode
     from panda3d_frame.Extensions.NodeEditor.Nodes.P3DCallScriptNode import Node as P3DCallScriptNode
     from panda3d_frame.Extensions.NodeEditor.Nodes.P3DScriptLoaderNode import Node as P3DScriptLoaderNode
@@ -13,6 +14,7 @@ class NodeEditorExtender:
         if NODE_EDITOR_AVAILABLE:
             return [
                 {"Logic >":{
+                    "Variable": ["PyVariableNode", PyVariableNode],
                     "Catch Event": ["P3DEventNode", P3DEventNode],
                     "Load Script": ["P3DScriptLoaderNode", P3DScriptLoaderNode],
                     "Call Function": ["P3DCallScriptNode", P3DCallScriptNode]
