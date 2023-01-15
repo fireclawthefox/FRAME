@@ -71,6 +71,7 @@ class PythonExporter:
         code += "        DirectObject.__init__(self)\n"
         code += "\n"
         indent = self.indent*self.indent_count
+
         for node, code_part in self.node_code_dict.items():
             snippet = code_part.init_snippet
             if snippet == "":
@@ -112,6 +113,18 @@ class PythonExporter:
         else:
             return self.__create_code(node)
 
+    def __find_node_in_connection(self, connected_with_node, node_type):
+        for connector in self.connections:
+            if connector.socketA.node is connected_with_node \
+            or connector.socketB.node is connected_with_node:
+                if connector.socketA.node is connected_with_node:
+                    if connector.socketB.node.name == node_type:
+                        return connector.socketB.node
+                else:
+                    if connector.socketA.node.name == node_type:
+                        return connector.socketA.node
+        return None
+
     def __create_script_call(self, node):
         code_part = CodePart()
         script_node = self.__find_node_in_connection(node, "Script")
@@ -148,19 +161,12 @@ class PythonExporter:
         code_part.variable = f"self.{var_name}"
         return code_part
 
-    def __find_node_in_connection(self, connected_with_node, node_type):
-        for connector in self.connections:
-            if connector.socketA.node is connected_with_node \
-            or connector.socketB.node is connected_with_node:
-                if connector.socketA.node is connected_with_node:
-                    if connector.socketB.node.name == node_type:
-                        return connector.socketB.node
-                else:
-                    if connector.socketA.node.name == node_type:
-                        return connector.socketA.node
-        return None
-
     def __create_set_variable(self, node):
         code_part = CodePart()
         code_part.variable = f"self.{node.inputList[0].getValue()}"
-        code_part.snippet = f"self.{node.inputList[0].getValue()} = {node.outputList[0].getValue()}"
+        if node.typeMap[node.inputList[2].getValue()] != object:
+            code_part.init_snippet = f"{code_part.variable} = {repr(node.typeMap[node.inputList[2].getValue()]())}"
+        else:
+            code_part.init_snippet = f"{code_part.variable} = None"
+        code_part.snippet = f"self.{node.inputList[0].getValue()} = {node.inputList[1].getValue()}"
+        return code_part
