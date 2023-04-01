@@ -200,16 +200,24 @@ class Frame(DirectObject, NodeEditorExtender):
     def disable_events(self):
         self.ignore_all()
 
+    def __get_project_name_title(self):
+        name = self.project_manager.get_project_name()
+        if name != "":
+            name = f"[project: {name}]"
+        return name
+
     def set_dirty_name(self):
         wp = WindowProperties()
-        wp.setTitle("*Panda3D FRAME")
+        wp.setTitle(f"*Panda3D FRAME {self.__get_project_name_title()}")
         base.win.requestProperties(wp)
 
     def set_clean_name(self):
+        wp = WindowProperties()
         if not self.get_any_editor_dirty():
-            wp = WindowProperties()
-            wp.setTitle("Panda3D FRAME")
-            base.win.requestProperties(wp)
+            wp.setTitle(f"Panda3D FRAME {self.__get_project_name_title()}")
+        else:
+            wp.setTitle(f"*Panda3D FRAME {self.__get_project_name_title()}")
+        base.win.requestProperties(wp)
 
     def show_warning(self, warning):
         def close_warning_dialog(decission):

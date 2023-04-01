@@ -25,6 +25,7 @@ class ProjectManager(DirectObject):
         if self.project_type == "pman":
             self.project = PmanProject()
             self.project.create_new_project(path)
+            base.messenger.send("FRAME_show_warning", ["NOTE:\nYou need to manually configure\npman config files!"])
         else:
             self.project_type = "FRAME"
             self.project = FrameProject()
@@ -35,6 +36,7 @@ class ProjectManager(DirectObject):
                 self.newProjectDlg.project_company,
                 self.newProjectDlg.project_template)
         self.newProjectDlg = None
+        base.messenger.send("request_clean_name")
 
     def run_project(self):
         if self.project is None:
@@ -89,6 +91,7 @@ class ProjectManager(DirectObject):
             self.project_type = "FRAME"
             self.project = FrameProject()
             self.project.load(project_path)
+        base.messenger.send("request_clean_name")
 
     def save(self):
         self.project.save()
@@ -96,3 +99,13 @@ class ProjectManager(DirectObject):
     def close(self):
         self.project.close()
         self.project = None
+        base.messenger.send("request_clean_name")
+
+    def get_project_name(self):
+        if self.project == None:
+            return ""
+
+        if self.project_type == "pman":
+            return self.project.get_project_name()
+        else:
+            return self.project.game_name

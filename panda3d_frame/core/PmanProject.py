@@ -48,3 +48,8 @@ class PmanProject:
 
     def close(self):
         self.project_config = None
+
+    def get_project_name(self):
+        if self.project_config is None:
+            return ""
+        return self.project_config['general']['name']
