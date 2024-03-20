@@ -5,18 +5,11 @@ from direct.gui.DirectLabel import DirectLabel
 from direct.gui.DirectButton import DirectButton
 from direct.gui import DirectGuiGlobals as DGG
 from DirectGuiExtension import DirectGuiHelper as DGH
-import subprocess
-import asyncio
 import sys
 import logging
 from dataclasses import dataclass
 from panda3d.core import TextNode
-
-@dataclass
-class PackageData:
-    name: str
-    version_current: str = "-"
-    version_new: str = ""
+from panda3d_frame.GUI.InternalEditors.PipHelper import PipHelper, PackageData
 
 @dataclass
 class PackageStoreInfo:
@@ -35,7 +28,7 @@ class EditorEntry:
         self.package_data = package_data
         self.update_package_info_func = update_package_info_func
         self.content_box = DirectBoxSizer(
-            frameSize=(0,1030,-100,0),
+            frameSize=(0,1060,-100,0),
             autoUpdateFrameSize=False,
             frameColor=(
                 0.8 + color_shift,
@@ -71,7 +64,7 @@ class EditorEntry:
 
         self.lbl_version = DirectLabel(
             text="0.0.0",
-            frameSize=(-5,50,-50,50),
+            frameSize=(-5,80,-50,50),
             frameColor=(0,0,0,0),
             text_scale=default_text_scale,
             text_align=TextNode.ALeft)
@@ -112,34 +105,31 @@ class EditorEntry:
             )
         self.content_box.addItem(self.btn_remove)
 
-    def set_package_info(self, installed, outdated):
+    def set_package_info(self, installed, outdated, all_packages):
         self.installed_packages_dict = installed
         self.outdated_packages_dict = outdated
         if self.need_update():
             self.package_data = self.outdated_packages_dict[self.package_data.name]
         elif self.is_installed():
             self.package_data = self.installed_packages_dict[self.package_data.name]
+        else:
+            self.package_data = all_packages[self.package_data.name]
         self.set_button()
 
     def install(self):
-        print("INSTALL")
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--user",
-            self.package_data.name])
-        self.update_package_info_func()
+        PipHelper.install(
+            self.package_data.name,
+            self.update_package_info_func)
 
     def update(self):
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "-U", "--user",
-            self.package_data.name])
-        self.update_package_info_func()
+        PipHelper.update(
+            self.package_data.name,
+            self.update_package_info_func)
 
     def uninstall(self):
-        print("UNINSTALL")
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "uninstall", "-y",
-            self.package_data.name])
-        self.update_package_info_func()
+        PipHelper.uninstall(
+            self.package_data.name,
+            self.update_package_info_func)
 
     def set_button(self):
         self.lbl_version.setText(self.package_data.version_current)
@@ -147,8 +137,10 @@ class EditorEntry:
         upgrade_text = "Not Installed"
         if self.is_installed():
             upgrade_text = "Up-To-Date"
-            if self.package_data.version_new != "":
+            if self.package_data.name in self.outdated_packages_dict.keys():
                 upgrade_text = f"New Version:\n{self.package_data.version_new}"
+        else:
+            self.lbl_version.setText(f"Available:\n{self.package_data.version_new}")
         self.lbl_upgrade.setText(upgrade_text)
         self.lbl_upgrade.setFrameSize(True)
 
@@ -182,6 +174,8 @@ class EditorStore:
     def __init__(self, parent):
         self.outdated_packages_dict = {}
         self.installed_packages_dict = {}
+
+        self.piphelper = PipHelper()
 
         self.initial_setup = True
 
@@ -261,7 +255,6 @@ class EditorStore:
             text_scale=20)
         self.content_box.addItem(header)
 
-
     def add_store_entries(self):
         packages = [
             ":Editors:",
@@ -312,6 +305,8 @@ class EditorStore:
                 entry.disable()
                 self.entries.append(entry)
                 even = not even
+                # Add the package to the pip helper list
+                self.piphelper.add_package(info.package_name)
 
         cs = self.content_box["frameSize"]
         self.store_frame["canvasSize"] = [cs[0], cs[1], cs[2] - 50, cs[3]]
@@ -321,105 +316,31 @@ class EditorStore:
         self.installed_packages_gathered = False
         self.outdated_packages_gathered = False
 
-        self.get_installed_packages()
-        self.get_outdated_packages()
+        self.piphelper.load_packages(self.get_installed_packages_callback, self.get_outdated_packages_callback)
 
     def update_entries(self):
         for entry in self.entries:
             entry.set_package_info(
                 self.installed_packages_dict,
-                self.outdated_packages_dict)
+                self.outdated_packages_dict,
+                self.piphelper.package_data)
+
+    def get_installed_packages_callback(self, package_data):
+        self.installed_packages_dict = package_data
+        if "panda3d-pman" in self.installed_packages_dict.keys():
+            print(self.installed_packages_dict["panda3d-pman"].version_current)
+        self.installed_packages_gathered = True
+        self.update_package_info_done()
+
+    def get_outdated_packages_callback(self, package_data):
+        self.outdated_packages_dict = package_data
+        self.outdated_packages_gathered = True
+        self.update_package_info_done()
 
     def update_package_info_done(self):
         if self.installed_packages_gathered and self.outdated_packages_gathered:
             self.update_entries()
             self.lbl_loading.hide()
-
-    def __get_filtered_pip_data(self, package_string):
-        # split by spaces
-        package_data_list = package_string.split(" ")
-        # remove empty parts in the list
-        filtered_list = list(filter(None, package_data_list))
-        # Check if the entry has the desired number of parts
-        return filtered_list
-
-    def get_pip_output_as_list_runner(self, task_name, args_list, callback_func):
-        if taskMgr.hasTaskNamed(task_name):
-            base.messenger.send(
-                "FRAME_show_warning",
-                ["This process is already running"])
-            return
-        task = taskMgr.add(self.get_pip_output_as_list_task, task_name)
-        task.proc = subprocess.Popen(
-            [sys.executable, "-m", "pip"] + args_list,
-            stdout=subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
-        task.callback_func = callback_func
-
-    def get_pip_output_as_list_task(self, task):
-        if task.proc.poll() is None:
-            return task.cont
-
-        if task.proc.poll() == 0:
-            if task.proc.stdout:
-                stdout = task.proc.stdout.read()
-            if task.proc.stderr:
-                stderr = task.proc.stderr.read()
-
-        ret_list = []
-        if stdout:
-            ret_list = stdout.decode().split("\n")[2:]
-
-        if stderr:
-            logging.error(stderr.decode())
-
-        task.callback_func(ret_list)
-
-        return task.done
-
-    def get_installed_packages(self):
-        self.get_pip_output_as_list_runner(
-            "get-installed-packages-task",
-            ["list"],
-            self.get_installed_packages_callback)
-
-    def get_installed_packages_callback(self, value):
-        self.installed_packages_dict = {}
-        for package in value:
-            filtered_list = self.__get_filtered_pip_data(package)
-            # Check if the entry has the desired number of parts
-            if len(filtered_list) < 2:
-                continue
-            # add the package data
-            data = PackageData(
-                filtered_list[0],
-                filtered_list[1],
-                "")
-            self.installed_packages_dict[filtered_list[0]] = data
-
-        self.installed_packages_gathered = True
-        self.update_package_info_done()
-
-    def get_outdated_packages(self):
-        self.get_pip_output_as_list_runner(
-            "get-outdated-packages-task",
-            ["list", "-o"],
-            self.get_outdated_packages_callback)
-
-    def get_outdated_packages_callback(self, value):
-        self.outdated_packages_dict = {}
-        for package in value:
-            filtered_list = self.__get_filtered_pip_data(package)
-            if len(filtered_list) < 3:
-                continue
-            data = PackageData(
-                filtered_list[0],
-                filtered_list[1],
-                filtered_list[2])
-            self.outdated_packages_dict[filtered_list[0]] = data
-
-        self.outdated_packages_gathered = True
-        self.update_package_info_done()
 
     def is_dirty(self):
         return False
