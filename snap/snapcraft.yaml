@@ -16,25 +16,34 @@ apps:
         command: bin/panda3d-frame
         #desktop: snap/local/panda3d-frame.desktop
         plugs:
-        # file handling
-        - home
-        - removable-media
-        # visual
-        - opengl
-        # audio
-        - alsa
-        - audio-playback
-        #- audio-record
+            # file handling
+            - home
+            - removable-media
+            # visual
+            - opengl
+            # audio
+            - alsa
+            - audio-playback
+            #- audio-record
+
+    pip:
+        command: bin/python -m pip
+        environment:
+            PYTHONPATH: ${PYTHONPATH:+$PYTHONPATH:}$SNAP_USER_DATA/.local/venv/
+            PIP_TARGET: $SNAP_USER_DATA/.local/venv
+        plugs:
+            - network
 
 parts:
     panda3d-frame:
         plugin: python
         python-requirements:
-          - snap/local/requirements_snap.txt
+            #- snap/local/requirements_snap.txt
+            - snap/local/requirements.txt
         source: . #https://github.com/fireclawthefox/FRAME.git
         stage-packages:
-        - libfreetype6
-        - libpng16-16
-        - libgl1
-        - libpulse0
-        - libasound2
+            - libfreetype6
+            - libpng16-16
+            - libgl1
+            - libpulse0
+            - libasound2
