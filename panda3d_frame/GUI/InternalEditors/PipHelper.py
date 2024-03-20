@@ -132,9 +132,6 @@ class PipHelper:
 
     def __get_pip_output_as_list_runner(self, task_name, args_list, callback_func):
         if taskMgr.hasTaskNamed(task_name):
-            #base.messenger.send(
-            #    "FRAME_show_warning",
-            #    ["This process is already running"])
             return
         task = taskMgr.add(self.__get_pip_output_as_list_task, task_name)
         task.proc = subprocess.Popen(
