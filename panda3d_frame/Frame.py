@@ -21,10 +21,9 @@ from direct.gui.DirectFrame import DirectFrame
 
 from DirectGuiExtension.DirectTooltip import DirectTooltip
 
-from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
-
 from panda3d_frame.GUI.MainView import MainView
 from panda3d_frame.GUI.InternalEditors.EditorStore import EditorStore
+from panda3d_frame.GUI.InternalEditors.SetupWizard.EditorSetupWizard import EditorSetupWizard
 from panda3d_frame.core.ProjectManager import ProjectManager
 from panda3d_frame.Extensions.NodeEditor.NodeEditorExtender import NodeEditorExtender
 
@@ -125,11 +124,20 @@ class Frame(DirectObject, NodeEditorExtender):
             if first_editor_frame is None:
                 first_editor_frame = editor_frame
 
-        es_ef = self.main_view.editor_selection.create_editor_button(
+        self.main_view.editor_selection.create_editor_button(
             "icons/EditorSelectionStore.png",
             EditorStore,
             self.tt,
             "Editor Store",
+            log_file,
+            config_file,
+            )
+
+        self.main_view.editor_selection.create_editor_button(
+            "icons/EditorSelectionSetupWizard.png",
+            EditorSetupWizard,
+            self.tt,
+            "Setup Wizard",
             log_file,
             config_file,
             )
